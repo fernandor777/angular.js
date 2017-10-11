@@ -6,11 +6,9 @@
  * @description
  *
  * The `ngAnimate` module provides support for CSS-based animations (keyframes and transitions) as well as JavaScript-based animations via
- * callback hooks. Animations are not enabled by default, however, by including `ngAnimate` the animation hooks are enabled for an Angular app.
+ * callback hooks. Animations are not enabled by default, however, by including `ngAnimate` the animation hooks are enabled for an AngularJS app.
  *
- * <div doc-module-components="ngAnimate"></div>
- *
- * # Usage
+ * ## Usage
  * Simply put, there are two ways to make use of animations when ngAnimate is used: by using **CSS** and **JavaScript**. The former works purely based
  * using CSS (by using matching CSS selectors/styles) and the latter triggers animations that are registered via `module.animation()`. For
  * both CSS and JS animations the sole requirement is to have a matching `CSS class` that exists both in the registered animation and within
@@ -28,7 +26,7 @@
  * | {@link ng.directive:ngIf#animations ngIf}                                                                | enter and leave                                                          |
  * | {@link ng.directive:ngClass#animations ngClass}                                                          | add and remove (the CSS class(es) present)                               |
  * | {@link ng.directive:ngShow#animations ngShow} & {@link ng.directive:ngHide#animations ngHide}            | add and remove (the ng-hide class value)                                 |
- * | {@link ng.directive:form#animation-hooks form} & {@link ng.directive:ngModel#animation-hooks ngModel}    | add and remove (dirty, pristine, valid, invalid & all other validations) |
+ * | {@link ng.directive:form#animations form} & {@link ng.directive:ngModel#animations ngModel}    | add and remove (dirty, pristine, valid, invalid & all other validations) |
  * | {@link module:ngMessages#animations ngMessages}                                                          | add and remove (ng-active & ng-inactive)                                 |
  * | {@link module:ngMessages#animations ngMessage}                                                           | enter and leave                                                          |
  *
@@ -37,7 +35,7 @@
  * ## CSS-based Animations
  *
  * CSS-based animations with ngAnimate are unique since they require no JavaScript code at all. By using a CSS class that we reference between our HTML
- * and CSS code we can create an animation that will be picked up by Angular when an the underlying directive performs an operation.
+ * and CSS code we can create an animation that will be picked up by AngularJS when an underlying directive performs an operation.
  *
  * The example below shows how an `enter` animation can be made possible on an element using `ng-if`:
  *
@@ -177,6 +175,10 @@
  *   /&#42; As of 1.4.4, this must always be set: it signals ngAnimate
  *     to not accidentally inherit a delay property from another CSS class &#42;/
  *   transition-duration: 0s;
+ *
+ *   /&#42; if you are using animations instead of transitions you should configure as follows:
+ *     animation-delay: 0.1s;
+ *     animation-duration: 0s; &#42;/
  * }
  * .my-animation.ng-enter.ng-enter-active {
  *   /&#42; standard transition styles &#42;/
@@ -292,7 +294,7 @@
  *     enter: function(element, doneFn) {
  *       jQuery(element).fadeIn(1000, doneFn);
  *
- *       // remember to call doneFn so that angular
+ *       // remember to call doneFn so that AngularJS
  *       // knows that the animation has concluded
  *     },
  *
@@ -340,7 +342,7 @@
  *
  * ## CSS + JS Animations Together
  *
- * AngularJS 1.4 and higher has taken steps to make the amalgamation of CSS and JS animations more flexible. However, unlike earlier versions of Angular,
+ * AngularJS 1.4 and higher has taken steps to make the amalgamation of CSS and JS animations more flexible. However, unlike earlier versions of AngularJS,
  * defining CSS and JS animations to work off of the same CSS class will not work anymore. Therefore the example below will only result in **JS animations taking
  * charge of the animation**:
  *
@@ -552,22 +554,23 @@
         }])
         .run(['$rootScope', function($rootScope) {
           $rootScope.records = [
-            { id:1, title: "Miss Beulah Roob" },
-            { id:2, title: "Trent Morissette" },
-            { id:3, title: "Miss Ava Pouros" },
-            { id:4, title: "Rod Pouros" },
-            { id:5, title: "Abdul Rice" },
-            { id:6, title: "Laurie Rutherford Sr." },
-            { id:7, title: "Nakia McLaughlin" },
-            { id:8, title: "Jordon Blanda DVM" },
-            { id:9, title: "Rhoda Hand" },
-            { id:10, title: "Alexandrea Sauer" }
+            { id: 1, title: 'Miss Beulah Roob' },
+            { id: 2, title: 'Trent Morissette' },
+            { id: 3, title: 'Miss Ava Pouros' },
+            { id: 4, title: 'Rod Pouros' },
+            { id: 5, title: 'Abdul Rice' },
+            { id: 6, title: 'Laurie Rutherford Sr.' },
+            { id: 7, title: 'Nakia McLaughlin' },
+            { id: 8, title: 'Jordon Blanda DVM' },
+            { id: 9, title: 'Rhoda Hand' },
+            { id: 10, title: 'Alexandrea Sauer' }
           ];
         }])
         .controller('HomeController', [function() {
           //empty
         }])
-        .controller('ProfileController', ['$rootScope', '$routeParams', function($rootScope, $routeParams) {
+        .controller('ProfileController', ['$rootScope', '$routeParams',
+            function ProfileController($rootScope, $routeParams) {
           var index = parseInt($routeParams.id, 10);
           var record = $rootScope.records[index - 1];
 
@@ -655,7 +658,7 @@
  *
  * ## Using $animate in your directive code
  *
- * So far we've explored how to feed in animations into an Angular application, but how do we trigger animations within our own directives in our application?
+ * So far we've explored how to feed in animations into an AngularJS application, but how do we trigger animations within our own directives in our application?
  * By injecting the `$animate` service into our directive code, we can trigger structural and class-based hooks which can then be consumed by animations. Let's
  * imagine we have a greeting box that shows and hides itself when the data changes
  *
@@ -698,7 +701,7 @@
  * });
  * ```
  *
- * (Note that earlier versions of Angular prior to v1.4 required the promise code to be wrapped using `$scope.$apply(...)`. This is not the case
+ * (Note that earlier versions of AngularJS prior to v1.4 required the promise code to be wrapped using `$scope.$apply(...)`. This is not the case
  * anymore.)
  *
  * In addition to the animation promise, we can also make use of animation-related callbacks within our directives and controller code by registering
@@ -713,7 +716,7 @@
  * }])
  * ```
  *
- * (Note that you will need to trigger a digest within the callback to get angular to notice any scope-related changes.)
+ * (Note that you will need to trigger a digest within the callback to get AngularJS to notice any scope-related changes.)
  */
 
 var copy;
@@ -740,7 +743,7 @@ var noop;
  * Click here {@link ng.$animate to learn more about animations with `$animate`}.
  */
 angular.module('ngAnimate', [], function initAngularHelpers() {
-  // Access helpers from angular core.
+  // Access helpers from AngularJS core.
   // Do it inside a `config` block to ensure `window.angular` is available.
   noop        = angular.noop;
   copy        = angular.copy;
@@ -755,6 +758,7 @@ angular.module('ngAnimate', [], function initAngularHelpers() {
   isFunction  = angular.isFunction;
   isElement   = angular.isElement;
 })
+  .info({ angularVersion: '"NG_VERSION_FULL"' })
   .directive('ngAnimateSwap', ngAnimateSwapDirective)
 
   .directive('ngAnimateChildren', $$AnimateChildrenDirective)

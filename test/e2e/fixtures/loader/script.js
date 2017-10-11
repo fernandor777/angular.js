@@ -1,3 +1,5 @@
+'use strict';
+
 angular.
   module('test', [
     'ngTouch',
@@ -11,6 +13,6 @@ angular.
     'ngAria',
     'ngAnimate'
   ]).
-  controller('TestCtrl', function TestCtrl($scope) {
+  controller('TestController', function($scope) {
     $scope.text = 'Hello, world!';
   });

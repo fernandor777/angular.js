@@ -3,18 +3,19 @@
 /**
  * @ngdoc directive
  * @name ngClick
+ * @restrict A
+ * @element ANY
+ * @priority 0
  *
  * @description
  * The ngClick directive allows you to specify custom behavior when
  * an element is clicked.
  *
- * @element ANY
- * @priority 0
  * @param {expression} ngClick {@link guide/expression Expression} to evaluate upon
  * click. ({@link guide/expression#-event- Event object is available as `$event`})
  *
  * @example
-   <example>
+   <example name="ng-click">
      <file name="index.html">
       <button ng-click="count = count + 1" ng-init="count=0">
         Increment
@@ -34,7 +35,7 @@
  */
 /*
  * A collection of directives that allows creation of custom event handlers that are defined as
- * angular expressions and are compiled and executed within the current scope.
+ * AngularJS expressions and are compiled and executed within the current scope.
  */
 var ngEventDirectives = {};
 
@@ -53,15 +54,15 @@ forEach(
       return {
         restrict: 'A',
         compile: function($element, attr) {
-          // We expose the powerful $event object on the scope that provides access to the Window,
-          // etc. that isn't protected by the fast paths in $parse.  We explicitly request better
-          // checks at the cost of speed since event handler expressions are not executed as
-          // frequently as regular change detection.
-          var fn = $parse(attr[directiveName], /* interceptorFn */ null, /* expensiveChecks */ true);
+          // NOTE:
+          // We expose the powerful `$event` object on the scope that provides access to the Window,
+          // etc. This is OK, because expressions are not sandboxed any more (and the expression
+          // sandbox was never meant to be a security feature anyway).
+          var fn = $parse(attr[directiveName]);
           return function ngEventHandler(scope, element) {
             element.on(eventName, function(event) {
               var callback = function() {
-                fn(scope, {$event:event});
+                fn(scope, {$event: event});
               };
               if (forceAsyncEvents[eventName] && $rootScope.$$phase) {
                 scope.$evalAsync(callback);
@@ -79,17 +80,18 @@ forEach(
 /**
  * @ngdoc directive
  * @name ngDblclick
+ * @restrict A
+ * @element ANY
+ * @priority 0
  *
  * @description
  * The `ngDblclick` directive allows you to specify custom behavior on a dblclick event.
  *
- * @element ANY
- * @priority 0
  * @param {expression} ngDblclick {@link guide/expression Expression} to evaluate upon
  * a dblclick. (The Event object is available as `$event`)
  *
  * @example
-   <example>
+   <example name="ng-dblclick">
      <file name="index.html">
       <button ng-dblclick="count = count + 1" ng-init="count=0">
         Increment (on double click)
@@ -103,17 +105,18 @@ forEach(
 /**
  * @ngdoc directive
  * @name ngMousedown
+ * @restrict A
+ * @element ANY
+ * @priority 0
  *
  * @description
  * The ngMousedown directive allows you to specify custom behavior on mousedown event.
  *
- * @element ANY
- * @priority 0
  * @param {expression} ngMousedown {@link guide/expression Expression} to evaluate upon
  * mousedown. ({@link guide/expression#-event- Event object is available as `$event`})
  *
  * @example
-   <example>
+   <example name="ng-mousedown">
      <file name="index.html">
       <button ng-mousedown="count = count + 1" ng-init="count=0">
         Increment (on mouse down)
@@ -127,17 +130,18 @@ forEach(
 /**
  * @ngdoc directive
  * @name ngMouseup
+ * @restrict A
+ * @element ANY
+ * @priority 0
  *
  * @description
  * Specify custom behavior on mouseup event.
  *
- * @element ANY
- * @priority 0
  * @param {expression} ngMouseup {@link guide/expression Expression} to evaluate upon
  * mouseup. ({@link guide/expression#-event- Event object is available as `$event`})
  *
  * @example
-   <example>
+   <example name="ng-mouseup">
      <file name="index.html">
       <button ng-mouseup="count = count + 1" ng-init="count=0">
         Increment (on mouse up)
@@ -150,17 +154,18 @@ forEach(
 /**
  * @ngdoc directive
  * @name ngMouseover
+ * @restrict A
+ * @element ANY
+ * @priority 0
  *
  * @description
  * Specify custom behavior on mouseover event.
  *
- * @element ANY
- * @priority 0
  * @param {expression} ngMouseover {@link guide/expression Expression} to evaluate upon
  * mouseover. ({@link guide/expression#-event- Event object is available as `$event`})
  *
  * @example
-   <example>
+   <example name="ng-mouseover">
      <file name="index.html">
       <button ng-mouseover="count = count + 1" ng-init="count=0">
         Increment (when mouse is over)
@@ -174,17 +179,18 @@ forEach(
 /**
  * @ngdoc directive
  * @name ngMouseenter
+ * @restrict A
+ * @element ANY
+ * @priority 0
  *
  * @description
  * Specify custom behavior on mouseenter event.
  *
- * @element ANY
- * @priority 0
  * @param {expression} ngMouseenter {@link guide/expression Expression} to evaluate upon
  * mouseenter. ({@link guide/expression#-event- Event object is available as `$event`})
  *
  * @example
-   <example>
+   <example name="ng-mouseenter">
      <file name="index.html">
       <button ng-mouseenter="count = count + 1" ng-init="count=0">
         Increment (when mouse enters)
@@ -198,17 +204,18 @@ forEach(
 /**
  * @ngdoc directive
  * @name ngMouseleave
+ * @restrict A
+ * @element ANY
+ * @priority 0
  *
  * @description
  * Specify custom behavior on mouseleave event.
  *
- * @element ANY
- * @priority 0
  * @param {expression} ngMouseleave {@link guide/expression Expression} to evaluate upon
  * mouseleave. ({@link guide/expression#-event- Event object is available as `$event`})
  *
  * @example
-   <example>
+   <example name="ng-mouseleave">
      <file name="index.html">
       <button ng-mouseleave="count = count + 1" ng-init="count=0">
         Increment (when mouse leaves)
@@ -222,17 +229,18 @@ forEach(
 /**
  * @ngdoc directive
  * @name ngMousemove
+ * @restrict A
+ * @element ANY
+ * @priority 0
  *
  * @description
  * Specify custom behavior on mousemove event.
  *
- * @element ANY
- * @priority 0
  * @param {expression} ngMousemove {@link guide/expression Expression} to evaluate upon
  * mousemove. ({@link guide/expression#-event- Event object is available as `$event`})
  *
  * @example
-   <example>
+   <example name="ng-mousemove">
      <file name="index.html">
       <button ng-mousemove="count = count + 1" ng-init="count=0">
         Increment (when mouse moves)
@@ -246,17 +254,18 @@ forEach(
 /**
  * @ngdoc directive
  * @name ngKeydown
+ * @restrict A
+ * @element ANY
+ * @priority 0
  *
  * @description
  * Specify custom behavior on keydown event.
  *
- * @element ANY
- * @priority 0
  * @param {expression} ngKeydown {@link guide/expression Expression} to evaluate upon
  * keydown. (Event object is available as `$event` and can be interrogated for keyCode, altKey, etc.)
  *
  * @example
-   <example>
+   <example name="ng-keydown">
      <file name="index.html">
       <input ng-keydown="count = count + 1" ng-init="count=0">
       key down count: {{count}}
@@ -268,17 +277,18 @@ forEach(
 /**
  * @ngdoc directive
  * @name ngKeyup
+ * @restrict A
+ * @element ANY
+ * @priority 0
  *
  * @description
  * Specify custom behavior on keyup event.
  *
- * @element ANY
- * @priority 0
  * @param {expression} ngKeyup {@link guide/expression Expression} to evaluate upon
  * keyup. (Event object is available as `$event` and can be interrogated for keyCode, altKey, etc.)
  *
  * @example
-   <example>
+   <example name="ng-keyup">
      <file name="index.html">
        <p>Typing in the input box below updates the key count</p>
        <input ng-keyup="count = count + 1" ng-init="count=0"> key up count: {{count}}
@@ -295,17 +305,18 @@ forEach(
 /**
  * @ngdoc directive
  * @name ngKeypress
+ * @restrict A
+ * @element ANY
  *
  * @description
  * Specify custom behavior on keypress event.
  *
- * @element ANY
  * @param {expression} ngKeypress {@link guide/expression Expression} to evaluate upon
  * keypress. ({@link guide/expression#-event- Event object is available as `$event`}
  * and can be interrogated for keyCode, altKey, etc.)
  *
  * @example
-   <example>
+   <example name="ng-keypress">
      <file name="index.html">
       <input ng-keypress="count = count + 1" ng-init="count=0">
       key press count: {{count}}
@@ -317,9 +328,12 @@ forEach(
 /**
  * @ngdoc directive
  * @name ngSubmit
+ * @restrict A
+ * @element form
+ * @priority 0
  *
  * @description
- * Enables binding angular expressions to onsubmit events.
+ * Enables binding AngularJS expressions to onsubmit events.
  *
  * Additionally it prevents the default action (which for form means sending the request to the
  * server and reloading the current page), but only if the form does not contain `action`,
@@ -332,13 +346,11 @@ forEach(
  * for a detailed discussion of when `ngSubmit` may be triggered.
  * </div>
  *
- * @element form
- * @priority 0
  * @param {expression} ngSubmit {@link guide/expression Expression} to eval.
  * ({@link guide/expression#-event- Event object is available as `$event`})
  *
  * @example
-   <example module="submitExample">
+   <example module="submitExample" name="ng-submit">
      <file name="index.html">
       <script>
         angular.module('submitExample', [])
@@ -380,6 +392,9 @@ forEach(
 /**
  * @ngdoc directive
  * @name ngFocus
+ * @restrict A
+ * @element window, input, select, textarea, a
+ * @priority 0
  *
  * @description
  * Specify custom behavior on focus event.
@@ -388,8 +403,6 @@ forEach(
  * AngularJS executes the expression using `scope.$evalAsync` if the event is fired
  * during an `$apply` to ensure a consistent state.
  *
- * @element window, input, select, textarea, a
- * @priority 0
  * @param {expression} ngFocus {@link guide/expression Expression} to evaluate upon
  * focus. ({@link guide/expression#-event- Event object is available as `$event`})
  *
@@ -400,6 +413,9 @@ forEach(
 /**
  * @ngdoc directive
  * @name ngBlur
+ * @restrict A
+ * @element window, input, select, textarea, a
+ * @priority 0
  *
  * @description
  * Specify custom behavior on blur event.
@@ -412,8 +428,6 @@ forEach(
  * AngularJS executes the expression using `scope.$evalAsync` if the event is fired
  * during an `$apply` to ensure a consistent state.
  *
- * @element window, input, select, textarea, a
- * @priority 0
  * @param {expression} ngBlur {@link guide/expression Expression} to evaluate upon
  * blur. ({@link guide/expression#-event- Event object is available as `$event`})
  *
@@ -424,17 +438,18 @@ forEach(
 /**
  * @ngdoc directive
  * @name ngCopy
+ * @restrict A
+ * @element window, input, select, textarea, a
+ * @priority 0
  *
  * @description
  * Specify custom behavior on copy event.
  *
- * @element window, input, select, textarea, a
- * @priority 0
  * @param {expression} ngCopy {@link guide/expression Expression} to evaluate upon
  * copy. ({@link guide/expression#-event- Event object is available as `$event`})
  *
  * @example
-   <example>
+   <example name="ng-copy">
      <file name="index.html">
       <input ng-copy="copied=true" ng-init="copied=false; value='copy me'" ng-model="value">
       copied: {{copied}}
@@ -445,17 +460,18 @@ forEach(
 /**
  * @ngdoc directive
  * @name ngCut
+ * @restrict A
+ * @element window, input, select, textarea, a
+ * @priority 0
  *
  * @description
  * Specify custom behavior on cut event.
  *
- * @element window, input, select, textarea, a
- * @priority 0
  * @param {expression} ngCut {@link guide/expression Expression} to evaluate upon
  * cut. ({@link guide/expression#-event- Event object is available as `$event`})
  *
  * @example
-   <example>
+   <example name="ng-cut">
      <file name="index.html">
       <input ng-cut="cut=true" ng-init="cut=false; value='cut me'" ng-model="value">
       cut: {{cut}}
@@ -466,17 +482,18 @@ forEach(
 /**
  * @ngdoc directive
  * @name ngPaste
+ * @restrict A
+ * @element window, input, select, textarea, a
+ * @priority 0
  *
  * @description
  * Specify custom behavior on paste event.
  *
- * @element window, input, select, textarea, a
- * @priority 0
  * @param {expression} ngPaste {@link guide/expression Expression} to evaluate upon
  * paste. ({@link guide/expression#-event- Event object is available as `$event`})
  *
  * @example
-   <example>
+   <example name="ng-paste">
      <file name="index.html">
       <input ng-paste="paste=true" ng-init="paste=false" placeholder='paste here'>
       pasted: {{paste}}

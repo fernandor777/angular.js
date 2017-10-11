@@ -25,7 +25,7 @@ describe('Filter: filter', function() {
     expect(filter(items, '34').length).toBe(1);
     expect(filter(items, '34')[0]).toBe(1234);
 
-    expect(filter(items, "I don't exist").length).toBe(0);
+    expect(filter(items, 'I don\'t exist').length).toBe(0);
   });
 
 
@@ -400,6 +400,7 @@ describe('Filter: filter', function() {
 
 
   it('should not be affected by `Object.prototype` when using a string expression', function() {
+    // eslint-disable-next-line no-extend-native
     Object.prototype.someProp = 'oo';
 
     var items = [
@@ -451,9 +452,9 @@ describe('Filter: filter', function() {
     }
     var argsObj = getArguments({name: 'Misko'}, {name: 'Igor'}, {name: 'Brad'});
 
-    var nodeList = jqLite("<p><span>Misko</span><span>Igor</span><span>Brad</span></p>")[0].childNodes;
+    var nodeList = jqLite('<p><span>Misko</span><span>Igor</span><span>Brad</span></p>')[0].childNodes;
     function nodeFilterPredicate(node) {
-      return node.innerHTML.indexOf("I") !== -1;
+      return node.innerHTML.indexOf('I') !== -1;
     }
 
     expect(filter(argsObj, 'i').length).toBe(2);

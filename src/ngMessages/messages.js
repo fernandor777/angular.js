@@ -20,7 +20,7 @@ var jqLite;
  * Currently, the ngMessages module only contains the code for the `ngMessages`, `ngMessagesInclude`
  * `ngMessage` and `ngMessageExp` directives.
  *
- * # Usage
+ * ## Usage
  * The `ngMessages` directive allows keys in a key/value collection to be associated with a child element
  * (or 'message') that will show or hide based on the truthiness of that key's value in the collection. A common use
  * case for `ngMessages` is to display error messages for inputs using the `$error` object exposed by the
@@ -64,7 +64,7 @@ var jqLite;
  * By default, `ngMessages` will only display one message for a particular key/value collection at any time. If more
  * than one message (or error) key is currently true, then which message is shown is determined by the order of messages
  * in the HTML template code (messages declared first are prioritised). This mechanism means the developer does not have
- * to prioritise messages using custom JavaScript code.
+ * to prioritize messages using custom JavaScript code.
  *
  * Given the following error object for our example (which informs us that the field `myField` currently has both the
  * `required` and `email` errors):
@@ -195,7 +195,7 @@ var jqLite;
  *
  * Feel free to use other structural directives such as ng-if and ng-switch to further control
  * what messages are active and when. Be careful, if you place ng-message on the same element
- * as these structural directives, Angular may not be able to determine if a message is active
+ * as these structural directives, AngularJS may not be able to determine if a message is active
  * or not. Therefore it is best to place the ng-message on a child element of the structural
  * directive.
  *
@@ -260,13 +260,14 @@ var jqLite;
  * {@link ngAnimate Click here} to learn how to use JavaScript animations or to learn more about ngAnimate.
  */
 angular.module('ngMessages', [], function initAngularHelpers() {
-  // Access helpers from angular core.
+  // Access helpers from AngularJS core.
   // Do it inside a `config` block to ensure `window.angular` is available.
   forEach = angular.forEach;
   isArray = angular.isArray;
   isString = angular.isString;
   jqLite = angular.element;
 })
+  .info({ angularVersion: '"NG_VERSION_FULL"' })
 
   /**
    * @ngdoc directive
@@ -307,7 +308,7 @@ angular.module('ngMessages', [], function initAngularHelpers() {
    * </ng-messages>
    * ```
    *
-   * @param {string} ngMessages an angular expression evaluating to a key/value object
+   * @param {string} ngMessages an AngularJS expression evaluating to a key/value object
    *                 (this is typically the $error object on an ngModel instance).
    * @param {string=} ngMessagesMultiple|multiple when set, all messages will be displayed with true
    *
@@ -347,7 +348,7 @@ angular.module('ngMessages', [], function initAngularHelpers() {
     return {
       require: 'ngMessages',
       restrict: 'AE',
-      controller: ['$element', '$scope', '$attrs', function($element, $scope, $attrs) {
+      controller: ['$element', '$scope', '$attrs', function NgMessagesCtrl($element, $scope, $attrs) {
         var ctrl = this;
         var latestKey = 0;
         var nextAttachId = 0;
@@ -407,9 +408,11 @@ angular.module('ngMessages', [], function initAngularHelpers() {
             messageCtrl.detach();
           });
 
-          unmatchedMessages.length !== totalMessages
-              ? $animate.setClass($element, ACTIVE_CLASS, INACTIVE_CLASS)
-              : $animate.setClass($element, INACTIVE_CLASS, ACTIVE_CLASS);
+          if (unmatchedMessages.length !== totalMessages) {
+            $animate.setClass($element, ACTIVE_CLASS, INACTIVE_CLASS);
+          } else {
+            $animate.setClass($element, INACTIVE_CLASS, ACTIVE_CLASS);
+          }
         };
 
         $scope.$watchCollection($attrs.ngMessages || $attrs['for'], ctrl.render);
@@ -425,8 +428,8 @@ angular.module('ngMessages', [], function initAngularHelpers() {
           if (!renderLater) {
             renderLater = true;
             $scope.$evalAsync(function() {
-              if (renderLater) {
-                cachedCollection && ctrl.render(cachedCollection);
+              if (renderLater && cachedCollection) {
+                ctrl.render(cachedCollection);
               }
             });
           }
@@ -589,6 +592,7 @@ angular.module('ngMessages', [], function initAngularHelpers() {
    * @name ngMessage
    * @restrict AE
    * @scope
+   * @priority 1
    *
    * @description
    * `ngMessage` is a directive with the purpose to show and hide a particular message.
@@ -627,10 +631,8 @@ angular.module('ngMessages', [], function initAngularHelpers() {
    * @scope
    *
    * @description
-   * `ngMessageExp` is a directive with the purpose to show and hide a particular message.
-   * For `ngMessageExp` to operate, a parent `ngMessages` directive on a parent DOM element
-   * must be situated since it determines which messages are visible based on the state
-   * of the provided key/value map that `ngMessages` listens on.
+   * `ngMessageExp` is the same as {@link directive:ngMessage `ngMessage`}, but instead of a static
+   * value, it accepts an expression to be evaluated for the message key.
    *
    * @usage
    * ```html

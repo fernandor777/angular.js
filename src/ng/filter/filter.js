@@ -9,6 +9,9 @@
  * Selects a subset of items from `array` and returns it as a new array.
  *
  * @param {Array} array The source array.
+ * <div class="alert alert-info">
+ *   **Note**: If the array contains objects that reference themselves, filtering is not possible.
+ * </div>
  * @param {string|Object|function()} expression The predicate to be used for selecting items from
  *   `array`.
  *
@@ -41,9 +44,10 @@
  *
  *     The final result is an array of those elements that the predicate returned true for.
  *
- * @param {function(actual, expected)|true|undefined} comparator Comparator which is used in
- *     determining if the expected value (from the filter expression) and actual value (from
- *     the object in the array) should be considered a match.
+ * @param {function(actual, expected)|true|false} [comparator] Comparator which is used in
+ *     determining if values retrieved using `expression` (when it is not a function) should be
+ *     considered a match based on the expected value (from the filter expression) and actual
+ *     value (from the object in the array).
  *
  *   Can be one of:
  *
@@ -54,17 +58,18 @@
  *   - `true`: A shorthand for `function(actual, expected) { return angular.equals(actual, expected)}`.
  *     This is essentially strict comparison of expected and actual.
  *
- *   - `false|undefined`: A short hand for a function which will look for a substring match in case
- *     insensitive way.
+ *   - `false`: A short hand for a function which will look for a substring match in a case
+ *     insensitive way. Primitive values are converted to strings. Objects are not compared against
+ *     primitives, unless they have a custom `toString` method (e.g. `Date` objects).
  *
- *     Primitive values are converted to strings. Objects are not compared against primitives,
- *     unless they have a custom `toString` method (e.g. `Date` objects).
  *
- * @param {string=} anyPropertyKey The special property name that matches against any property.
+ *   Defaults to `false`.
+ *
+ * @param {string} [anyPropertyKey] The special property name that matches against any property.
  *     By default `$`.
  *
  * @example
-   <example>
+   <example name="filter-filter">
      <file name="index.html">
        <div ng-init="friends = [{name:'John', phone:'555-1276'},
                                 {name:'Mary', phone:'800-BIG-MARY'},
@@ -156,9 +161,8 @@ function filterFilter() {
       case 'number':
       case 'string':
         matchAgainstAnyProp = true;
-        //jshint -W086
+        // falls through
       case 'object':
-        //jshint +W086
         predicateFn = createPredicateFn(expression, comparator, anyPropertyKey, matchAgainstAnyProp);
         break;
       default:
@@ -226,7 +230,10 @@ function deepCompare(actual, expected, comparator, anyPropertyKey, matchAgainstA
       var key;
       if (matchAgainstAnyProp) {
         for (key in actual) {
-          if ((key.charAt(0) !== '$') && deepCompare(actual[key], expected, comparator, anyPropertyKey, true)) {
+          // Under certain, rare, circumstances, key may not be a string and `charAt` will be undefined
+          // See: https://github.com/angular/angular.js/issues/15644
+          if (key.charAt && (key.charAt(0) !== '$') &&
+              deepCompare(actual[key], expected, comparator, anyPropertyKey, true)) {
             return true;
           }
         }
@@ -248,7 +255,6 @@ function deepCompare(actual, expected, comparator, anyPropertyKey, matchAgainstA
       } else {
         return comparator(actual, expected);
       }
-      break;
     case 'function':
       return false;
     default:

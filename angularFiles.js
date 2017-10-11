@@ -70,6 +70,7 @@ var angularFiles = {
     'src/ng/directive/ngInit.js',
     'src/ng/directive/ngList.js',
     'src/ng/directive/ngModel.js',
+    'src/ng/directive/ngModelOptions.js',
     'src/ng/directive/ngNonBindable.js',
     'src/ng/directive/ngOptions.js',
     'src/ng/directive/ngPluralize.js',
@@ -80,7 +81,6 @@ var angularFiles = {
     'src/ng/directive/ngTransclude.js',
     'src/ng/directive/script.js',
     'src/ng/directive/select.js',
-    'src/ng/directive/style.js',
     'src/ng/directive/validators.js',
     'src/angular.bind.js',
     'src/publishExternalApis.js',
@@ -146,7 +146,6 @@ var angularFiles = {
     'ngTouch': [
       'src/ngTouch/touch.js',
       'src/ngTouch/swipe.js',
-      'src/ngTouch/directive/ngClick.js',
       'src/ngTouch/directive/ngSwipe.js'
     ],
     'ngAria': [
@@ -210,7 +209,7 @@ var angularFiles = {
     'build/docs/docs-scenario.js'
   ],
 
-  "karmaModules": [
+  'karmaModules': [
     'build/angular.js',
     '@angularSrcModules',
     'test/modules/no_bootstrap.js',
@@ -236,15 +235,6 @@ var angularFiles = {
     '@angularTest'
   ],
 
-  'karmaJqueryOld': [
-    'bower_components/jquery-2.1/dist/jquery.js',
-    'test/jquery_alias.js',
-    '@angularSrc',
-    '@angularSrcModules',
-    '@angularScenario',
-    '@angularTest'
-  ],
-
   'karmaJqueryExclude': [
     'src/angular-bootstrap.js',
     'src/ngScenario/angular-bootstrap.js',
@@ -252,6 +242,17 @@ var angularFiles = {
     'src/angular.bind.js'
   ]
 };
+
+['2.1', '2.2'].forEach(function(jQueryVersion) {
+  angularFiles['karmaJquery' + jQueryVersion] = []
+    .concat(angularFiles.karmaJquery)
+    .map(function(path) {
+      if (path.startsWith('bower_components/jquery')) {
+        return path.replace(/^bower_components\/jquery/, 'bower_components/jquery-' + jQueryVersion);
+      }
+      return path;
+    });
+});
 
 angularFiles['angularSrcModules'] = [].concat(
   angularFiles['angularModules']['ngAnimate'],
@@ -274,7 +275,7 @@ if (exports) {
     Array.prototype.slice.call(arguments, 0).forEach(function(filegroup) {
       angularFiles[filegroup].forEach(function(file) {
         // replace @ref
-        var match = file.match(/^\@(.*)/);
+        var match = file.match(/^@(.*)/);
         if (match) {
           files = files.concat(angularFiles[match[1]]);
         } else {

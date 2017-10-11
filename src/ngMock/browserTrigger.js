@@ -54,28 +54,26 @@
     var evnt;
     if (/transitionend/.test(eventType)) {
       if (window.WebKitTransitionEvent) {
-        evnt = new WebKitTransitionEvent(eventType, eventData);
-        evnt.initEvent(eventType, false, true);
+        evnt = new window.WebKitTransitionEvent(eventType, eventData);
+        evnt.initEvent(eventType, eventData.bubbles, true);
       } else {
         try {
-          evnt = new TransitionEvent(eventType, eventData);
-        }
-        catch (e) {
+          evnt = new window.TransitionEvent(eventType, eventData);
+        } catch (e) {
           evnt = window.document.createEvent('TransitionEvent');
-          evnt.initTransitionEvent(eventType, null, null, null, eventData.elapsedTime || 0);
+          evnt.initTransitionEvent(eventType, eventData.bubbles, null, null, eventData.elapsedTime || 0);
         }
       }
     } else if (/animationend/.test(eventType)) {
       if (window.WebKitAnimationEvent) {
-        evnt = new WebKitAnimationEvent(eventType, eventData);
-        evnt.initEvent(eventType, false, true);
+        evnt = new window.WebKitAnimationEvent(eventType, eventData);
+        evnt.initEvent(eventType, eventData.bubbles, true);
       } else {
         try {
-          evnt = new AnimationEvent(eventType, eventData);
-        }
-        catch (e) {
+          evnt = new window.AnimationEvent(eventType, eventData);
+        } catch (e) {
           evnt = window.document.createEvent('AnimationEvent');
-          evnt.initAnimationEvent(eventType, null, null, null, eventData.elapsedTime || 0);
+          evnt.initAnimationEvent(eventType, eventData.bubbles, null, null, eventData.elapsedTime || 0);
         }
       }
     } else if (/touch/.test(eventType) && supportsTouchEvents()) {
@@ -194,20 +192,21 @@
     patchEventTargetForBubbling(evnt, element);
     do {
       element.dispatchEvent(evnt);
+      // eslint-disable-next-line no-unmodified-loop-condition
     } while (!stop && (element = element.parentNode));
   }
 
   function patchEventTargetForBubbling(event, target) {
     event._target = target;
-    Object.defineProperty(event, "target", {get: function() { return this._target;}});
+    Object.defineProperty(event, 'target', {get: function() { return this._target;}});
   }
 
   function isAttachedToDocument(element) {
-    while (element = element.parentNode) {
+    while ((element = element.parentNode)) {
         if (element === window) {
             return true;
         }
     }
     return false;
   }
-}());
+})();

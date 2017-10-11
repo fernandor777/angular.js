@@ -6,7 +6,7 @@
 # Filters
 
 Filters format the value of an expression for display to the user. They can be used in view
-templates, controllers or services. Angular comes with a collection of
+templates, controllers or services. AngularJS comes with a collection of
 [built-in filters](api/ng/filter), but it is easy to define your own as well.
 
 The underlying API is the {@link ng.$filterProvider}.
@@ -44,7 +44,7 @@ as inputs. Filters that receive [Objects](https://developer.mozilla.org/en-US/do
 as input are executed on each `$digest`, as it would be too costly to track if the inputs have changed.
 
 2. Filters that are marked as `$stateful` are also executed on each $digest.
-See {@link guide/filter#stateful-filters Stateful filters} for more information. Note that no Angular
+See {@link guide/filter#stateful-filters Stateful filters} for more information. Note that no AngularJS
 core filters are $stateful.
 
 
@@ -69,7 +69,7 @@ The example below therefore calls the filter directly in the controller.
 By this, the controller is able to call the filter only when needed (e.g. when the data is loaded from the backend
 or the filter expression is changed).
 
-<example module="FilterInControllerModule">
+<example module="FilterInControllerModule" name="filter-in-controller">
   <file name="index.html">
     <div ng-controller="FilterController as ctrl">
       <div>
@@ -85,7 +85,7 @@ or the filter expression is changed).
 
   <file name="script.js">
     angular.module('FilterInControllerModule', []).
-      controller('FilterController', ['filterFilter', function(filterFilter) {
+      controller('FilterController', ['filterFilter', function FilterController(filterFilter) {
         this.array = [
           {name: 'Tobias'},
           {name: 'Jeff'},
@@ -109,12 +109,13 @@ as the first argument. Any filter arguments are passed in as additional argument
 function.
 
 The filter function should be a [pure function](http://en.wikipedia.org/wiki/Pure_function), which
-means that it should be stateless and idempotent, and not rely for example on other Angular services.
-Angular relies on this contract and will by default execute a filter only when the inputs to the function change.
+means that it should always return the same result given the same input arguments and should not affect
+external state, for example, other AngularJS services. AngularJS relies on this contract and will by default
+execute a filter only when the inputs to the function change.
 {@link guide/filter#stateful-filters Stateful filters} are possible, but less performant.
 
 <div class="alert alert-warning">
-**Note:** Filter names must be valid angular {@link expression} identifiers, such as `uppercase` or `orderBy`.
+**Note:** Filter names must be valid AngularJS {@link expression} identifiers, such as `uppercase` or `orderBy`.
 Names with special characters, such as hyphens and dots, are not allowed.  If you wish to namespace
 your filters, then you can use capitalization (`myappSubsectionFilterx`) or underscores
 (`myapp_subsection_filterx`).
@@ -123,7 +124,7 @@ your filters, then you can use capitalization (`myappSubsectionFilterx`) or unde
 The following sample filter reverses a text string. In addition, it conditionally makes the
 text upper-case.
 
-<example module="myReverseFilterApp">
+<example module="myReverseFilterApp" name="filter-reverse">
   <file name="index.html">
     <div ng-controller="MyController">
       <input ng-model="greeting" type="text"><br>
@@ -139,7 +140,7 @@ text upper-case.
       .filter('reverse', function() {
         return function(input, uppercase) {
           input = input || '';
-          var out = "";
+          var out = '';
           for (var i = 0; i < input.length; i++) {
             out = input.charAt(i) + out;
           }
@@ -161,14 +162,14 @@ text upper-case.
 ### Stateful filters
 
 It is strongly discouraged to write filters that are stateful, because the execution of those can't
-be optimized by Angular, which often leads to performance issues. Many stateful filters can be
+be optimized by AngularJS, which often leads to performance issues. Many stateful filters can be
 converted into stateless filters just by exposing the hidden state as a model and turning it into an
 argument for the filter.
 
 If you however do need to write a stateful filter, you have to mark the filter as `$stateful`, which
 means that it will be executed one or more times during the each `$digest` cycle.
 
-<example module="myStatefulFilterApp">
+<example module="myStatefulFilterApp" name="filter-stateful">
   <file name="index.html">
     <div ng-controller="MyController">
       Input: <input ng-model="greeting" type="text"><br>
@@ -200,4 +201,4 @@ means that it will be executed one or more times during the each `$digest` cycle
 
 ## Testing custom filters
 
-See the [phonecat tutorial](http://docs.angularjs.org/tutorial/step_09#test) for an example.
+See the [phonecat tutorial](http://docs.angularjs.org/tutorial/step_11#testing) for an example.

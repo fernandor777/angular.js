@@ -3,27 +3,28 @@
 var $interpolateMinErr = angular.$interpolateMinErr = minErr('$interpolate');
 $interpolateMinErr.throwNoconcat = function(text) {
   throw $interpolateMinErr('noconcat',
-      "Error while interpolating: {0}\nStrict Contextual Escaping disallows " +
-      "interpolations that concatenate multiple expressions when a trusted value is " +
-      "required.  See http://docs.angularjs.org/api/ng.$sce", text);
+      'Error while interpolating: {0}\nStrict Contextual Escaping disallows ' +
+      'interpolations that concatenate multiple expressions when a trusted value is ' +
+      'required.  See http://docs.angularjs.org/api/ng.$sce', text);
 };
 
 $interpolateMinErr.interr = function(text, err) {
-  return $interpolateMinErr('interr', "Can't interpolate: {0}\n{1}", text, err.toString());
+  return $interpolateMinErr('interr', 'Can\'t interpolate: {0}\n{1}', text, err.toString());
 };
 
 /**
  * @ngdoc provider
  * @name $interpolateProvider
+ * @this
  *
  * @description
  *
  * Used for configuring the interpolation markup. Defaults to `{{` and `}}`.
  *
  * <div class="alert alert-danger">
- * This feature is sometimes used to mix different markup languages, e.g. to wrap an Angular
+ * This feature is sometimes used to mix different markup languages, e.g. to wrap an AngularJS
  * template within a Python Jinja template (or any other template language). Mixing templating
- * languages is **very dangerous**. The embedding template language will not safely escape Angular
+ * languages is **very dangerous**. The embedding template language will not safely escape AngularJS
  * expressions, so any user-controlled values in the template will cause Cross Site Scripting (XSS)
  * security bugs!
  * </div>
@@ -72,9 +73,8 @@ function $InterpolateProvider() {
     if (value) {
       startSymbol = value;
       return this;
-    } else {
-      return startSymbol;
     }
+    return startSymbol;
   };
 
   /**
@@ -90,9 +90,8 @@ function $InterpolateProvider() {
     if (value) {
       endSymbol = value;
       return this;
-    } else {
-      return endSymbol;
     }
+    return endSymbol;
   };
 
 
@@ -111,13 +110,13 @@ function $InterpolateProvider() {
         replace(escapedEndRegexp, endSymbol);
     }
 
-    //TODO: this is the same as the constantWatchDelegate in parse.js
+    // TODO: this is the same as the constantWatchDelegate in parse.js
     function constantWatchDelegate(scope, listener, objectEquality, constantInterp) {
-      var unwatch;
-      return unwatch = scope.$watch(function constantInterpolateWatch(scope) {
+      var unwatch = scope.$watch(function constantInterpolateWatch(scope) {
         unwatch();
         return constantInterp(scope);
       }, listener, objectEquality);
+      return unwatch;
     }
 
     /**
@@ -139,7 +138,7 @@ function $InterpolateProvider() {
      * ```js
      *   var $interpolate = ...; // injected
      *   var exp = $interpolate('Hello {{name | uppercase}}!');
-     *   expect(exp({name:'Angular'})).toEqual('Hello ANGULAR!');
+     *   expect(exp({name:'AngularJS'})).toEqual('Hello ANGULARJS!');
      * ```
      *
      * `$interpolate` takes an optional fourth argument, `allOrNothing`. If `allOrNothing` is
@@ -157,8 +156,8 @@ function $InterpolateProvider() {
      *   // "allOrNothing" mode
      *   exp = $interpolate('{{greeting}} {{name}}!', false, null, true);
      *   expect(exp(context)).toBeUndefined();
-     *   context.name = 'Angular';
-     *   expect(exp(context)).toEqual('Hello Angular!');
+     *   context.name = 'AngularJS';
+     *   expect(exp(context)).toEqual('Hello AngularJS!');
      * ```
      *
      * `allOrNothing` is useful for interpolating URLs. `ngSrc` and `ngSrcset` use this behavior.
@@ -184,7 +183,7 @@ function $InterpolateProvider() {
      * this is typically useful only when user-data is used in rendering a template from the server, or
      * when otherwise untrusted data is used by a directive.
      *
-     * <example>
+     * <example name="interpolation">
      *  <file name="index.html">
      *    <div ng-init="username='A user'">
      *      <p ng-init="apptitle='Escaping demo'">{{apptitle}}: \{\{ username = "defaced value"; \}\}
@@ -330,7 +329,7 @@ function $InterpolateProvider() {
           expressions: expressions,
           $$watchDelegate: function(scope, listener) {
             var lastValue;
-            return scope.$watchGroup(parseFns, function interpolateFnWatcher(values, oldValues) {
+            return scope.$watchGroup(parseFns, /** @this */ function interpolateFnWatcher(values, oldValues) {
               var currValue = compute(values);
               if (isFunction(listener)) {
                 listener.call(this, currValue, values !== oldValues ? lastValue : currValue, scope);
@@ -386,5 +385,4 @@ function $InterpolateProvider() {
     return $interpolate;
   }];
 }
-
 

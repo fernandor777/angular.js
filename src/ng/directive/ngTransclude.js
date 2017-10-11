@@ -13,8 +13,8 @@
  *
  * If the transcluded content is not empty (i.e. contains one or more DOM nodes, including whitespace text nodes), any existing
  * content of this element will be removed before the transcluded content is inserted.
- * If the transcluded content is empty, the existing content is left intact. This lets you provide fallback content in the case
- * that no transcluded content is provided.
+ * If the transcluded content is empty (or only whitespace), the existing content is left intact. This lets you provide fallback
+ * content in the case that no transcluded content is provided.
  *
  * @element ANY
  *
@@ -69,7 +69,7 @@
  * This example shows how to use `NgTransclude` with fallback content, that
  * is displayed if no transcluded content is provided.
  *
- * <example module="transcludeFallbackContentExample">
+ * <example module="transcludeFallbackContentExample" name="ng-transclude">
  * <file name="index.html">
  * <script>
  * angular.module('transcludeFallbackContentExample', [])
@@ -122,7 +122,7 @@
  *   </file>
  *   <file name="app.js">
  *    angular.module('multiSlotTranscludeExample', [])
- *     .directive('pane', function(){
+ *     .directive('pane', function() {
  *        return {
  *          restrict: 'E',
  *          transclude: {
@@ -139,7 +139,7 @@
  *    })
  *    .controller('ExampleController', ['$scope', function($scope) {
  *      $scope.title = 'Lorem Ipsum';
- *      $scope.link = "https://google.com";
+ *      $scope.link = 'https://google.com';
  *      $scope.text = 'Neque porro quisquam est qui dolorem ipsum quia dolor...';
  *    }]);
  *   </file>
@@ -195,7 +195,7 @@ var ngTranscludeDirective = ['$compile', function($compile) {
         }
 
         function ngTranscludeCloneAttachFn(clone, transcludedScope) {
-          if (clone.length) {
+          if (clone.length && notWhitespace(clone)) {
             $element.append(clone);
           } else {
             useFallbackContent();
@@ -211,6 +211,15 @@ var ngTranscludeDirective = ['$compile', function($compile) {
           fallbackLinkFn($scope, function(clone) {
             $element.append(clone);
           });
+        }
+
+        function notWhitespace(nodes) {
+          for (var i = 0, ii = nodes.length; i < ii; i++) {
+            var node = nodes[i];
+            if (node.nodeType !== NODE_TYPE_TEXT || node.nodeValue.trim()) {
+              return true;
+            }
+          }
         }
       };
     }

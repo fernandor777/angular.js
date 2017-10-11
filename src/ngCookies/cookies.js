@@ -5,25 +5,21 @@
  * @name ngCookies
  * @description
  *
- * # ngCookies
- *
  * The `ngCookies` module provides a convenient wrapper for reading and writing browser cookies.
- *
- *
- * <div doc-module-components="ngCookies"></div>
  *
  * See {@link ngCookies.$cookies `$cookies`} for usage.
  */
 
 
 angular.module('ngCookies', ['ng']).
+  info({ angularVersion: '"NG_VERSION_FULL"' }).
   /**
    * @ngdoc provider
    * @name $cookiesProvider
    * @description
    * Use `$cookiesProvider` to change the default behavior of the {@link ngCookies.$cookies $cookies} service.
    * */
-   provider('$cookies', [function $CookiesProvider() {
+   provider('$cookies', [/** @this */function $CookiesProvider() {
     /**
      * @ngdoc property
      * @name $cookiesProvider#defaults
@@ -46,6 +42,16 @@ angular.module('ngCookies', ['ng']).
      * Note: By default, the address that appears in your `<base>` tag will be used as the path.
      * This is important so that cookies will be visible for all routes when html5mode is enabled.
      *
+     * @example
+     *
+     * ```js
+     * angular.module('cookiesProviderExample', ['ngCookies'])
+     *   .config(['$cookiesProvider', function($cookiesProvider) {
+     *     // Setting default options
+     *     $cookiesProvider.defaults.domain = 'foo.com';
+     *     $cookiesProvider.defaults.secure = true;
+     *   }]);
+     * ```
      **/
     var defaults = this.defaults = {};
 
@@ -61,7 +67,7 @@ angular.module('ngCookies', ['ng']).
      * Provides read/write access to browser's cookies.
      *
      * <div class="alert alert-info">
-     * Up until Angular 1.3, `$cookies` exposed properties that represented the
+     * Up until AngularJS 1.3, `$cookies` exposed properties that represented the
      * current browser cookie values. In version 1.4, this behavior has changed, and
      * `$cookies` now provides a standard api of getters, setters etc.
      * </div>

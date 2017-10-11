@@ -10,8 +10,6 @@
  * attributes that convey state or semantic information about the application for users
  * of assistive technologies, such as screen readers.
  *
- * <div doc-module-components="ngAria"></div>
- *
  * ## Usage
  *
  * For ngAria to do its magic, simply include the module `ngAria` as a dependency. The following
@@ -53,8 +51,8 @@
  * {@link ngAria.$ariaProvider#config config} method. For more details, see the
  * {@link guide/accessibility Developer Guide}.
  */
- /* global -ngAriaModule */
 var ngAriaModule = angular.module('ngAria', ['ng']).
+                        info({ angularVersion: '"NG_VERSION_FULL"' }).
                         provider('$aria', $AriaProvider);
 
 /**
@@ -70,6 +68,7 @@ var isNodeOneOf = function(elem, nodeTypeArray) {
 /**
  * @ngdoc provider
  * @name $ariaProvider
+ * @this
  *
  * @description
  *
@@ -252,14 +251,6 @@ ngAriaModule.directive('ngShow', ['$aria', function($aria) {
       var shape = getShape(attr, elem);
 
       return {
-        pre: function(scope, elem, attr, ngModel) {
-          if (shape === 'checkbox') {
-            //Use the input[checkbox] $isEmpty implementation for elements with checkbox roles
-            ngModel.$isEmpty = function(value) {
-              return value === false;
-            };
-          }
-        },
         post: function(scope, elem, attr, ngModel) {
           var needsTabIndex = shouldAttachAttr('tabindex', 'tabindex', elem, false);
 
@@ -269,7 +260,7 @@ ngAriaModule.directive('ngShow', ['$aria', function($aria) {
 
           function getRadioReaction(newVal) {
             // Strict comparison would cause a BC
-            /* jshint eqeqeq:false */
+            // eslint-disable-next-line eqeqeq
             var boolVal = (attr.value == ngModel.$viewValue);
             elem.attr('aria-checked', boolVal);
           }
@@ -363,7 +354,7 @@ ngAriaModule.directive('ngShow', ['$aria', function($aria) {
   return {
     restrict: 'A',
     compile: function(elem, attr) {
-      var fn = $parse(attr.ngClick, /* interceptorFn */ null, /* expensiveChecks */ true);
+      var fn = $parse(attr.ngClick);
       return function(scope, elem, attr) {
 
         if (!isNodeOneOf(elem, nodeBlackList)) {

@@ -20,7 +20,7 @@
  *
  * ## What is  ngMessageFormat?
  *
- * The ngMessageFormat module extends the Angular {@link ng.$interpolate `$interpolate`} service
+ * The ngMessageFormat module extends the AngularJS {@link ng.$interpolate `$interpolate`} service
  * with a syntax for handling pluralization and gender specific messages, which is based on the
  * [ICU MessageFormat syntax][ICU].
  *
@@ -54,9 +54,9 @@
  *     this.gender = gender;
  *   }
  *
- *   var alice   = new Person("Alice", "female"),
- *       bob     = new Person("Bob", "male"),
- *       ashley = new Person("Ashley", "");
+ *   var alice   = new Person('Alice', 'female'),
+ *       bob     = new Person('Bob', 'male'),
+ *       ashley = new Person('Ashley', '');
  *
  *   angular.module('msgFmtExample', ['ngMessageFormat'])
  *     .controller('AppController', ['$scope', function($scope) {
@@ -97,11 +97,11 @@
  *     this.gender = gender;
  *   }
  *
- *   var alice   = new Person("Alice", "female"),
- *       bob     = new Person("Bob", "male"),
- *       sarah     = new Person("Sarah", "female"),
- *       harry   = new Person("Harry Potter", "male"),
- *       ashley   = new Person("Ashley", "");
+ *   var alice   = new Person('Alice', 'female'),
+ *       bob     = new Person('Bob', 'male'),
+ *       sarah     = new Person('Sarah', 'female'),
+ *       harry   = new Person('Harry Potter', 'male'),
+ *       ashley   = new Person('Ashley', '');
  *
  *   angular.module('msgFmtExample', ['ngMessageFormat'])
  *     .controller('AppController', ['$scope', function($scope) {
@@ -157,10 +157,10 @@
  *        this.gender = gender;
  *      }
  *
- *      var alice   = new Person("Alice", "female"),
- *          bob     = new Person("Bob", "male"),
- *          harry   = new Person("Harry Potter", "male"),
- *          ashley   = new Person("Ashley", "");
+ *      var alice   = new Person('Alice', 'female'),
+ *          bob     = new Person('Bob', 'male'),
+ *          harry   = new Person('Harry Potter', 'male'),
+ *          ashley   = new Person('Ashley', '');
  *
  *      angular.module('msgFmtExample', ['ngMessageFormat'])
  *        .controller('AppController', ['$scope', function($scope) {
@@ -173,13 +173,13 @@
  */
 
 var $$MessageFormatFactory = ['$parse', '$locale', '$sce', '$exceptionHandler', function $$messageFormat(
-                   $parse,   $locale,   $sce,   $exceptionHandler) {
+                               $parse,   $locale,   $sce,   $exceptionHandler) {
 
   function getStringifier(trustedContext, allOrNothing, text) {
     return function stringifier(value) {
       try {
         value = trustedContext ? $sce['getTrusted'](trustedContext, value) : $sce['valueOf'](value);
-        return allOrNothing && (value === void 0) ? value : $$stringify(value);
+        return allOrNothing && (value === undefined) ? value : $$stringify(value);
       } catch (err) {
         $exceptionHandler($interpolateMinErr['interr'](text, err));
       }
@@ -200,7 +200,7 @@ var $$MessageFormatFactory = ['$parse', '$locale', '$sce', '$exceptionHandler', 
 }];
 
 var $$interpolateDecorator = ['$$messageFormat', '$delegate', function $$interpolateDecorator($$messageFormat, $interpolate) {
-  if ($interpolate['startSymbol']() !== "{{" || $interpolate['endSymbol']() !== "}}") {
+  if ($interpolate['startSymbol']() !== '{{' || $interpolate['endSymbol']() !== '}}') {
     throw $interpolateMinErr('nochgmustache', 'angular-message-format.js currently does not allow you to use custom start and end symbols for interpolation.');
   }
   var interpolate = $$messageFormat['interpolate'];
@@ -216,6 +216,7 @@ var toJson;
 var $$stringify;
 
 var module = window['angular']['module']('ngMessageFormat', ['ng']);
+module['info']({ 'angularVersion': '"NG_VERSION_FULL"' });
 module['factory']('$$messageFormat', $$MessageFormatFactory);
 module['config'](['$provide', function($provide) {
   $interpolateMinErr = window['angular']['$interpolateMinErr'];

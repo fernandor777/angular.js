@@ -2,41 +2,48 @@
 
 /* global shallowCopy: false */
 
-// There are necessary for `shallowCopy()` (included via `src/shallowCopy.js`).
+// `isArray` and `isObject` are necessary for `shallowCopy()` (included via `src/shallowCopy.js`).
 // They are initialized inside the `$RouteProvider`, to ensure `window.angular` is available.
 var isArray;
 var isObject;
+var isDefined;
+var noop;
 
 /**
  * @ngdoc module
  * @name ngRoute
  * @description
  *
- * # ngRoute
- *
- * The `ngRoute` module provides routing and deeplinking services and directives for angular apps.
+ * The `ngRoute` module provides routing and deeplinking services and directives for AngularJS apps.
  *
  * ## Example
- * See {@link ngRoute.$route#example $route} for an example of configuring and using `ngRoute`.
+ * See {@link ngRoute.$route#examples $route} for an example of configuring and using `ngRoute`.
  *
- *
- * <div doc-module-components="ngRoute"></div>
  */
- /* global -ngRouteModule */
-var ngRouteModule = angular.module('ngRoute', ['ng']).
-                        provider('$route', $RouteProvider),
-    $routeMinErr = angular.$$minErr('ngRoute');
+/* global -ngRouteModule */
+var ngRouteModule = angular.
+  module('ngRoute', []).
+  info({ angularVersion: '"NG_VERSION_FULL"' }).
+  provider('$route', $RouteProvider).
+  // Ensure `$route` will be instantiated in time to capture the initial `$locationChangeSuccess`
+  // event (unless explicitly disabled). This is necessary in case `ngView` is included in an
+  // asynchronously loaded template.
+  run(instantiateRoute);
+var $routeMinErr = angular.$$minErr('ngRoute');
+var isEagerInstantiationEnabled;
+
 
 /**
  * @ngdoc provider
  * @name $routeProvider
+ * @this
  *
  * @description
  *
  * Used for configuring routes.
  *
  * ## Example
- * See {@link ngRoute.$route#example $route} for an example of configuring and using `ngRoute`.
+ * See {@link ngRoute.$route#examples $route} for an example of configuring and using `ngRoute`.
  *
  * ## Dependencies
  * Requires the {@link ngRoute `ngRoute`} module to be installed.
@@ -44,6 +51,8 @@ var ngRouteModule = angular.module('ngRoute', ['ng']).
 function $RouteProvider() {
   isArray = angular.isArray;
   isObject = angular.isObject;
+  isDefined = angular.isDefined;
+  noop = angular.noop;
 
   function inherit(parent, extra) {
     return angular.extend(Object.create(parent), extra);
@@ -95,6 +104,8 @@ function $RouteProvider() {
    *      - `{Array.<Object>}` - route parameters extracted from the current
    *        `$location.path()` by applying the current route
    *
+   *      One of `template` or `templateUrl` is required.
+   *
    *    - `templateUrl` – `{(string|Function)=}` – path or function that returns a path to an html
    *      template that should be used by {@link ngRoute.directive:ngView ngView}.
    *
@@ -102,6 +113,8 @@ function $RouteProvider() {
    *
    *      - `{Array.<Object>}` - route parameters extracted from the current
    *        `$location.path()` by applying the current route
+   *
+   *      One of `templateUrl` or `template` is required.
    *
    *    - `resolve` - `{Object.<string, Function>=}` - An optional map of dependencies which should
    *      be injected into the controller. If any of these dependencies are promises, the router
@@ -247,7 +260,7 @@ function $RouteProvider() {
 
     path = path
       .replace(/([().])/g, '\\$1')
-      .replace(/(\/)?:(\w+)(\*\?|[\?\*])?/g, function(_, slash, key, option) {
+      .replace(/(\/)?:(\w+)(\*\?|[?*])?/g, function(_, slash, key, option) {
         var optional = (option === '?' || option === '*?') ? '?' : null;
         var star = (option === '*' || option === '*?') ? '*' : null;
         keys.push({ name: key, optional: !!optional });
@@ -261,7 +274,7 @@ function $RouteProvider() {
           + ')'
           + (optional || '');
       })
-      .replace(/([\/$\*])/g, '\\$1');
+      .replace(/([/$*])/g, '\\$1');
 
     ret.regexp = new RegExp('^' + path + '$', insensitive ? 'i' : '');
     return ret;
@@ -287,6 +300,47 @@ function $RouteProvider() {
     return this;
   };
 
+  /**
+   * @ngdoc method
+   * @name $routeProvider#eagerInstantiationEnabled
+   * @kind function
+   *
+   * @description
+   * Call this method as a setter to enable/disable eager instantiation of the
+   * {@link ngRoute.$route $route} service upon application bootstrap. You can also call it as a
+   * getter (i.e. without any arguments) to get the current value of the
+   * `eagerInstantiationEnabled` flag.
+   *
+   * Instantiating `$route` early is necessary for capturing the initial
+   * {@link ng.$location#$locationChangeStart $locationChangeStart} event and navigating to the
+   * appropriate route. Usually, `$route` is instantiated in time by the
+   * {@link ngRoute.ngView ngView} directive. Yet, in cases where `ngView` is included in an
+   * asynchronously loaded template (e.g. in another directive's template), the directive factory
+   * might not be called soon enough for `$route` to be instantiated _before_ the initial
+   * `$locationChangeSuccess` event is fired. Eager instantiation ensures that `$route` is always
+   * instantiated in time, regardless of when `ngView` will be loaded.
+   *
+   * The default value is true.
+   *
+   * **Note**:<br />
+   * You may want to disable the default behavior when unit-testing modules that depend on
+   * `ngRoute`, in order to avoid an unexpected request for the default route's template.
+   *
+   * @param {boolean=} enabled - If provided, update the internal `eagerInstantiationEnabled` flag.
+   *
+   * @returns {*} The current value of the `eagerInstantiationEnabled` flag if used as a getter or
+   *     itself (for chaining) if used as a setter.
+   */
+  isEagerInstantiationEnabled = true;
+  this.eagerInstantiationEnabled = function eagerInstantiationEnabled(enabled) {
+    if (isDefined(enabled)) {
+      isEagerInstantiationEnabled = enabled;
+      return this;
+    }
+
+    return isEagerInstantiationEnabled;
+  };
+
 
   this.$get = ['$rootScope',
                '$location',
@@ -295,7 +349,8 @@ function $RouteProvider() {
                '$injector',
                '$templateRequest',
                '$sce',
-      function($rootScope, $location, $routeParams, $q, $injector, $templateRequest, $sce) {
+               '$browser',
+      function($rootScope, $location, $routeParams, $q, $injector, $templateRequest, $sce, $browser) {
 
     /**
      * @ngdoc service
@@ -380,12 +435,12 @@ function $RouteProvider() {
      *      })
      *
      *      .controller('BookController', function($scope, $routeParams) {
-     *          $scope.name = "BookController";
+     *          $scope.name = 'BookController';
      *          $scope.params = $routeParams;
      *      })
      *
      *      .controller('ChapterController', function($scope, $routeParams) {
-     *          $scope.name = "ChapterController";
+     *          $scope.name = 'ChapterController';
      *          $scope.params = $routeParams;
      *      })
      *
@@ -418,15 +473,15 @@ function $RouteProvider() {
      *     it('should load and compile correct template', function() {
      *       element(by.linkText('Moby: Ch1')).click();
      *       var content = element(by.css('[ng-view]')).getText();
-     *       expect(content).toMatch(/controller\: ChapterController/);
-     *       expect(content).toMatch(/Book Id\: Moby/);
-     *       expect(content).toMatch(/Chapter Id\: 1/);
+     *       expect(content).toMatch(/controller: ChapterController/);
+     *       expect(content).toMatch(/Book Id: Moby/);
+     *       expect(content).toMatch(/Chapter Id: 1/);
      *
      *       element(by.partialLinkText('Scarlet')).click();
      *
      *       content = element(by.css('[ng-view]')).getText();
-     *       expect(content).toMatch(/controller\: BookController/);
-     *       expect(content).toMatch(/Book Id\: Scarlet/);
+     *       expect(content).toMatch(/controller: BookController/);
+     *       expect(content).toMatch(/Book Id: Scarlet/);
      *     });
      *   </file>
      * </example>
@@ -625,6 +680,8 @@ function $RouteProvider() {
 
         var nextRoutePromise = $q.resolve(nextRoute);
 
+        $browser.$$incOutstandingRequestCount();
+
         nextRoutePromise.
           then(getRedirectionData).
           then(handlePossibleRedirection).
@@ -645,6 +702,13 @@ function $RouteProvider() {
             if (nextRoute === $route.current) {
               $rootScope.$broadcast('$routeChangeError', nextRoute, lastRoute, error);
             }
+          }).finally(function() {
+            // Because `commitRoute()` is called from a `$rootScope.$evalAsync` block (see
+            // `$locationWatch`), this `$$completeOutstandingRequest()` call will not cause
+            // `outstandingRequestCount` to hit zero.  This is important in case we are redirecting
+            // to a new route which also requires some asynchronous work.
+
+            $browser.$$completeOutstandingRequest(noop);
           });
       }
     }
@@ -790,4 +854,12 @@ function $RouteProvider() {
       return result.join('');
     }
   }];
+}
+
+instantiateRoute.$inject = ['$injector'];
+function instantiateRoute($injector) {
+  if (isEagerInstantiationEnabled) {
+    // Instantiate `$route`
+    $injector.get('$route');
+  }
 }

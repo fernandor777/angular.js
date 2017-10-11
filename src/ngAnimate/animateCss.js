@@ -1,5 +1,7 @@
 'use strict';
 
+/* exported $AnimateCssProvider */
+
 var ANIMATE_TIMER_KEY = '$$animateCss';
 
 /**
@@ -16,11 +18,11 @@ var ANIMATE_TIMER_KEY = '$$animateCss';
  * Note that only browsers that support CSS transitions and/or keyframe animations are capable of
  * rendering animations triggered via `$animateCss` (bad news for IE9 and lower).
  *
- * ## Usage
+ * ## General Use
  * Once again, `$animateCss` is designed to be used inside of a registered JavaScript animation that
  * is powered by ngAnimate. It is possible to use `$animateCss` directly inside of a directive, however,
  * any automatic control over cancelling animations and/or preventing animations from being run on
- * child elements will not be handled by Angular. For this to work as expected, please use `$animate` to
+ * child elements will not be handled by AngularJS. For this to work as expected, please use `$animate` to
  * trigger the animation and then setup a JavaScript animation that injects `$animateCss` to trigger
  * the CSS animation.
  *
@@ -217,7 +219,6 @@ var ANIMATE_TIMER_KEY = '$$animateCss';
  * * `end` - This method will cancel the animation and remove all applied CSS classes and styles.
  */
 var ONE_SECOND = 1000;
-var BASE_TEN = 10;
 
 var ELAPSED_TIME_MAX_DECIMAL_PLACES = 3;
 var CLOSING_TIME_BUFFER = 1.5;
@@ -347,7 +348,7 @@ function registerRestorableStyles(backup, node, properties) {
   });
 }
 
-var $AnimateCssProvider = ['$animateProvider', function($animateProvider) {
+var $AnimateCssProvider = ['$animateProvider', /** @this */ function($animateProvider) {
   var gcsLookup = createLocalCacheLookup();
   var gcsStaggerLookup = createLocalCacheLookup();
 
@@ -360,7 +361,7 @@ var $AnimateCssProvider = ['$animateProvider', function($animateProvider) {
 
     var parentCounter = 0;
     function gcsHashFn(node, extraClasses) {
-      var KEY = "$$ngAnimateParentKey";
+      var KEY = '$$ngAnimateParentKey';
       var parentNode = node.parentNode;
       var parentID = parentNode[KEY] || (parentNode[KEY] = ++parentCounter);
       return parentID + '-' + node.getAttribute('class') + '-' + extraClasses;
@@ -411,7 +412,6 @@ var $AnimateCssProvider = ['$animateProvider', function($animateProvider) {
       return stagger || {};
     }
 
-    var cancelLastRAFRequest;
     var rafWaitQueue = [];
     function waitUntilQuiet(callback) {
       rafWaitQueue.push(callback);
@@ -632,7 +632,7 @@ var $AnimateCssProvider = ['$animateProvider', function($animateProvider) {
 
       if (options.delay != null) {
         var delayStyle;
-        if (typeof options.delay !== "boolean") {
+        if (typeof options.delay !== 'boolean') {
           delayStyle = parseFloat(options.delay);
           // number in options.delay means we have to recalculate the delay for the closing timeout
           maxDelay = Math.max(delayStyle, 0);
@@ -710,7 +710,7 @@ var $AnimateCssProvider = ['$animateProvider', function($animateProvider) {
         close(true);
       }
 
-      function close(rejected) { // jshint ignore:line
+      function close(rejected) {
         // if the promise has been called already then we shouldn't close
         // the animation again
         if (animationClosed || (animationCompleted && animationPaused)) return;
@@ -737,8 +737,11 @@ var $AnimateCssProvider = ['$animateProvider', function($animateProvider) {
 
         if (Object.keys(restoreStyles).length) {
           forEach(restoreStyles, function(value, prop) {
-            value ? node.style.setProperty(prop, value)
-                  : node.style.removeProperty(prop);
+            if (value) {
+              node.style.setProperty(prop, value);
+            } else {
+              node.style.removeProperty(prop);
+            }
           });
         }
 
@@ -802,6 +805,12 @@ var $AnimateCssProvider = ['$animateProvider', function($animateProvider) {
         event.stopPropagation();
         var ev = event.originalEvent || event;
 
+        if (ev.target !== node) {
+          // Since TransitionEvent / AnimationEvent bubble up,
+          // we have to ignore events by finished child animations
+          return;
+        }
+
         // we now always use `Date.now()` due to the recent changes with
         // event.timeStamp in Firefox, Webkit and Chrome (see #13494 for more info)
         var timeStamp = ev.$manualTimeStamp || Date.now();
@@ -841,9 +850,11 @@ var $AnimateCssProvider = ['$animateProvider', function($animateProvider) {
             animationPaused = !playAnimation;
             if (timings.animationDuration) {
               var value = blockKeyframeAnimations(node, animationPaused);
-              animationPaused
-                  ? temporaryStyles.push(value)
-                  : removeFromArray(temporaryStyles, value);
+              if (animationPaused) {
+                temporaryStyles.push(value);
+              } else {
+                removeFromArray(temporaryStyles, value);
+              }
             }
           } else if (animationPaused && playAnimation) {
             animationPaused = false;
@@ -910,7 +921,7 @@ var $AnimateCssProvider = ['$animateProvider', function($animateProvider) {
           }
 
           if (flags.applyAnimationDelay) {
-            relativeDelay = typeof options.delay !== "boolean" && truthyTimingValue(options.delay)
+            relativeDelay = typeof options.delay !== 'boolean' && truthyTimingValue(options.delay)
                   ? parseFloat(options.delay)
                   : relativeDelay;
 

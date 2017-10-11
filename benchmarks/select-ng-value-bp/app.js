@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /* globals angular, benchmarkSteps */
 
@@ -20,7 +20,7 @@ app.controller('DataController', function($scope, $element) {
     $scope.groups = [];
     var i = 0;
     var group;
-    while(i < $scope.count) {
+    while (i < $scope.count) {
       if (i % 100 === 0) {
         group = {
           name: 'group-' + $scope.groups.length,

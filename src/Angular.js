@@ -1,99 +1,106 @@
 'use strict';
 
-/* We need to tell jshint what variables are being exported */
-/* global angular: true,
-  msie: true,
-  jqLite: true,
-  jQuery: true,
-  slice: true,
-  splice: true,
-  push: true,
-  toString: true,
-  ngMinErr: true,
-  angularModule: true,
-  uid: true,
-  REGEX_STRING_REGEXP: true,
-  VALIDITY_STATE_PROPERTY: true,
+/* We need to tell ESLint what variables are being exported */
+/* exported
+  angular,
+  msie,
+  jqLite,
+  jQuery,
+  slice,
+  splice,
+  push,
+  toString,
+  minErrConfig,
+  errorHandlingConfig,
+  isValidObjectMaxDepth,
+  ngMinErr,
+  angularModule,
+  uid,
+  REGEX_STRING_REGEXP,
+  VALIDITY_STATE_PROPERTY,
 
-  lowercase: true,
-  uppercase: true,
-  manualLowercase: true,
-  manualUppercase: true,
-  nodeName_: true,
-  isArrayLike: true,
-  forEach: true,
-  forEachSorted: true,
-  reverseParams: true,
-  nextUid: true,
-  setHashKey: true,
-  extend: true,
-  toInt: true,
-  inherit: true,
-  merge: true,
-  noop: true,
-  identity: true,
-  valueFn: true,
-  isUndefined: true,
-  isDefined: true,
-  isObject: true,
-  isBlankObject: true,
-  isString: true,
-  isNumber: true,
-  isDate: true,
-  isArray: true,
-  isFunction: true,
-  isRegExp: true,
-  isWindow: true,
-  isScope: true,
-  isFile: true,
-  isFormData: true,
-  isBlob: true,
-  isBoolean: true,
-  isPromiseLike: true,
-  trim: true,
-  escapeForRegexp: true,
-  isElement: true,
-  makeMap: true,
-  includes: true,
-  arrayRemove: true,
-  copy: true,
-  equals: true,
-  csp: true,
-  jq: true,
-  concat: true,
-  sliceArgs: true,
-  bind: true,
-  toJsonReplacer: true,
-  toJson: true,
-  fromJson: true,
-  convertTimezoneToLocal: true,
-  timezoneToOffset: true,
-  startingTag: true,
-  tryDecodeURIComponent: true,
-  parseKeyValue: true,
-  toKeyValue: true,
-  encodeUriSegment: true,
-  encodeUriQuery: true,
-  angularInit: true,
-  bootstrap: true,
-  getTestability: true,
-  snake_case: true,
-  bindJQuery: true,
-  assertArg: true,
-  assertArgFn: true,
-  assertNotHasOwnProperty: true,
-  getter: true,
-  getBlockNodes: true,
-  hasOwnProperty: true,
-  createMap: true,
-  stringify: true,
+  lowercase,
+  uppercase,
+  manualLowercase,
+  manualUppercase,
+  nodeName_,
+  isArrayLike,
+  forEach,
+  forEachSorted,
+  reverseParams,
+  nextUid,
+  setHashKey,
+  extend,
+  toInt,
+  inherit,
+  merge,
+  noop,
+  identity,
+  valueFn,
+  isUndefined,
+  isDefined,
+  isObject,
+  isBlankObject,
+  isString,
+  isNumber,
+  isNumberNaN,
+  isDate,
+  isError,
+  isArray,
+  isFunction,
+  isRegExp,
+  isWindow,
+  isScope,
+  isFile,
+  isFormData,
+  isBlob,
+  isBoolean,
+  isPromiseLike,
+  trim,
+  escapeForRegexp,
+  isElement,
+  makeMap,
+  includes,
+  arrayRemove,
+  copy,
+  simpleCompare,
+  equals,
+  csp,
+  jq,
+  concat,
+  sliceArgs,
+  bind,
+  toJsonReplacer,
+  toJson,
+  fromJson,
+  convertTimezoneToLocal,
+  timezoneToOffset,
+  startingTag,
+  tryDecodeURIComponent,
+  parseKeyValue,
+  toKeyValue,
+  encodeUriSegment,
+  encodeUriQuery,
+  angularInit,
+  bootstrap,
+  getTestability,
+  snake_case,
+  bindJQuery,
+  assertArg,
+  assertArgFn,
+  assertNotHasOwnProperty,
+  getter,
+  getBlockNodes,
+  hasOwnProperty,
+  createMap,
+  stringify,
 
-  NODE_TYPE_ELEMENT: true,
-  NODE_TYPE_ATTRIBUTE: true,
-  NODE_TYPE_TEXT: true,
-  NODE_TYPE_COMMENT: true,
-  NODE_TYPE_DOCUMENT: true,
-  NODE_TYPE_DOCUMENT_FRAGMENT: true,
+  NODE_TYPE_ELEMENT,
+  NODE_TYPE_ATTRIBUTE,
+  NODE_TYPE_TEXT,
+  NODE_TYPE_COMMENT,
+  NODE_TYPE_DOCUMENT,
+  NODE_TYPE_DOCUMENT_FRAGMENT
 */
 
 ////////////////////////////////////
@@ -105,13 +112,11 @@
  * @installation
  * @description
  *
- * # ng (core module)
  * The ng module is loaded by default when an AngularJS application is started. The module itself
  * contains the essential components for an AngularJS application to function. The table below
  * lists a high level breakdown of each of the services/factories, filters, directives and testing
  * components available within this core module.
  *
- * <div doc-module-components="ng"></div>
  */
 
 var REGEX_STRING_REGEXP = /^\/(.+)\/([a-z]*)$/;
@@ -120,23 +125,41 @@ var REGEX_STRING_REGEXP = /^\/(.+)\/([a-z]*)$/;
 // This is used so that it's possible for internal tests to create mock ValidityStates.
 var VALIDITY_STATE_PROPERTY = 'validity';
 
+
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 
+/**
+ * @private
+ *
+ * @description Converts the specified string to lowercase.
+ * @param {string} string String to be converted to lowercase.
+ * @returns {string} Lowercased string.
+ */
 var lowercase = function(string) {return isString(string) ? string.toLowerCase() : string;};
+
+/**
+ * @private
+ *
+ * @description Converts the specified string to uppercase.
+ * @param {string} string String to be converted to uppercase.
+ * @returns {string} Uppercased string.
+ */
 var uppercase = function(string) {return isString(string) ? string.toUpperCase() : string;};
 
 
 var manualLowercase = function(s) {
-  /* jshint bitwise: false */
+  /* eslint-disable no-bitwise */
   return isString(s)
       ? s.replace(/[A-Z]/g, function(ch) {return String.fromCharCode(ch.charCodeAt(0) | 32);})
       : s;
+  /* eslint-enable */
 };
 var manualUppercase = function(s) {
-  /* jshint bitwise: false */
+  /* eslint-disable no-bitwise */
   return isString(s)
       ? s.replace(/[a-z]/g, function(ch) {return String.fromCharCode(ch.charCodeAt(0) & ~32);})
       : s;
+  /* eslint-enable */
 };
 
 
@@ -165,6 +188,7 @@ var
     angularModule,
     uid               = 0;
 
+// Support: IE 9-11 only
 /**
  * documentMode is an IE-only property
  * http://msdn.microsoft.com/en-us/library/ie/cc196988(v=vs.85).aspx
@@ -191,7 +215,7 @@ function isArrayLike(obj) {
 
   // Support: iOS 8.2 (not reproducible in simulator)
   // "length" in obj used to prevent JIT error (gh-11508)
-  var length = "length" in Object(obj) && obj.length;
+  var length = 'length' in Object(obj) && obj.length;
 
   // NodeList objects (with `item` method) and
   // other objects with suitable length characteristics are array-like
@@ -395,6 +419,20 @@ function extend(dst) {
 * Unlike {@link angular.extend extend()}, `merge()` recursively descends into object properties of source
 * objects, performing a deep copy.
 *
+* @deprecated
+* sinceVersion="1.6.5"
+* This function is deprecated, but will not be removed in the 1.x lifecycle.
+* There are edge cases (see {@link angular.merge#known-issues known issues}) that are not
+* supported by this function. We suggest
+* using [lodash's merge()](https://lodash.com/docs/4.17.4#merge) instead.
+*
+* @knownIssue
+* This is a list of (known) object types that are not handled correctly by this function:
+* - [`Blob`](https://developer.mozilla.org/docs/Web/API/Blob)
+* - [`MediaStream`](https://developer.mozilla.org/docs/Web/API/MediaStream)
+* - [`CanvasGradient`](https://developer.mozilla.org/docs/Web/API/CanvasGradient)
+* - AngularJS {@link $rootScope.Scope scopes};
+*
 * @param {Object} dst Destination object.
 * @param {...Object} src Source object(s).
 * @returns {Object} Reference to `dst`.
@@ -408,6 +446,11 @@ function merge(dst) {
 function toInt(str) {
   return parseInt(str, 10);
 }
+
+var isNumberNaN = Number.isNaN || function isNumberNaN(num) {
+  // eslint-disable-next-line no-self-compare
+  return num !== num;
+};
 
 
 function inherit(parent, extra) {
@@ -592,12 +635,30 @@ function isDate(value) {
  * @kind function
  *
  * @description
- * Determines if a reference is an `Array`.
+ * Determines if a reference is an `Array`. Alias of Array.isArray.
  *
  * @param {*} value Reference to check.
  * @returns {boolean} True if `value` is an `Array`.
  */
 var isArray = Array.isArray;
+
+/**
+ * @description
+ * Determines if a reference is an `Error`.
+ * Loosely based on https://www.npmjs.com/package/iserror
+ *
+ * @param {*} value Reference to check.
+ * @returns {boolean} True if `value` is an `Error`.
+ */
+function isError(value) {
+  var tag = toString.call(value);
+  switch (tag) {
+    case '[object Error]': return true;
+    case '[object Exception]': return true;
+    case '[object DOMException]': return true;
+    default: return value instanceof Error;
+  }
+}
 
 /**
  * @ngdoc function
@@ -668,7 +729,7 @@ function isPromiseLike(obj) {
 }
 
 
-var TYPED_ARRAY_REGEXP = /^\[object (?:Uint8|Uint8Clamped|Uint16|Uint32|Int8|Int16|Int32|Float32|Float64)Array\]$/;
+var TYPED_ARRAY_REGEXP = /^\[object (?:Uint8|Uint8Clamped|Uint16|Uint32|Int8|Int16|Int32|Float32|Float64)Array]$/;
 function isTypedArray(value) {
   return value && isNumber(value.length) && TYPED_ARRAY_REGEXP.test(toString.call(value));
 }
@@ -686,8 +747,10 @@ var trim = function(value) {
 // http://docs.closure-library.googlecode.com/git/local_closure_goog_string_string.js.source.html#line1021
 // Prereq: s is a string.
 var escapeForRegexp = function(s) {
-  return s.replace(/([-()\[\]{}+?*.$\^|,:#<!\\])/g, '\\$1').
-           replace(/\x08/g, '\\x08');
+  return s
+    .replace(/([-()[\]{}+?*.$^|,:#<!\\])/g, '\\$1')
+    // eslint-disable-next-line no-control-regex
+    .replace(/\x08/g, '\\x08');
 };
 
 
@@ -766,7 +829,7 @@ function arrayRemove(array, value) {
  * @returns {*} The copy or updated `destination`, if `destination` was specified.
  *
  * @example
-  <example module="copyExample">
+  <example module="copyExample" name="angular-copy">
     <file name="index.html">
       <div ng-controller="ExampleController">
         <form novalidate class="simple-form">
@@ -778,7 +841,7 @@ function arrayRemove(array, value) {
           <button ng-click="update(user)">SAVE</button>
         </form>
         <pre>form = {{user | json}}</pre>
-        <pre>master = {{master | json}}</pre>
+        <pre>leader = {{leader | json}}</pre>
       </div>
     </file>
     <file name="script.js">
@@ -786,16 +849,16 @@ function arrayRemove(array, value) {
       angular.
         module('copyExample', []).
         controller('ExampleController', ['$scope', function($scope) {
-          $scope.master = {};
+          $scope.leader = {};
 
           $scope.reset = function() {
             // Example with 1 argument
-            $scope.user = angular.copy($scope.master);
+            $scope.user = angular.copy($scope.leader);
           };
 
           $scope.update = function(user) {
             // Example with 2 arguments
-            angular.copy(user, $scope.master);
+            angular.copy(user, $scope.leader);
           };
 
           $scope.reset();
@@ -803,16 +866,17 @@ function arrayRemove(array, value) {
     </file>
   </example>
  */
-function copy(source, destination) {
+function copy(source, destination, maxDepth) {
   var stackSource = [];
   var stackDest = [];
+  maxDepth = isValidObjectMaxDepth(maxDepth) ? maxDepth : NaN;
 
   if (destination) {
     if (isTypedArray(destination) || isArrayBuffer(destination)) {
-      throw ngMinErr('cpta', "Can't copy! TypedArray destination cannot be mutated.");
+      throw ngMinErr('cpta', 'Can\'t copy! TypedArray destination cannot be mutated.');
     }
     if (source === destination) {
-      throw ngMinErr('cpi', "Can't copy! Source and destination are identical.");
+      throw ngMinErr('cpi', 'Can\'t copy! Source and destination are identical.');
     }
 
     // Empty the destination object
@@ -828,35 +892,39 @@ function copy(source, destination) {
 
     stackSource.push(source);
     stackDest.push(destination);
-    return copyRecurse(source, destination);
+    return copyRecurse(source, destination, maxDepth);
   }
 
-  return copyElement(source);
+  return copyElement(source, maxDepth);
 
-  function copyRecurse(source, destination) {
+  function copyRecurse(source, destination, maxDepth) {
+    maxDepth--;
+    if (maxDepth < 0) {
+      return '...';
+    }
     var h = destination.$$hashKey;
     var key;
     if (isArray(source)) {
       for (var i = 0, ii = source.length; i < ii; i++) {
-        destination.push(copyElement(source[i]));
+        destination.push(copyElement(source[i], maxDepth));
       }
     } else if (isBlankObject(source)) {
       // createMap() fast path --- Safe to avoid hasOwnProperty check because prototype chain is empty
       for (key in source) {
-        destination[key] = copyElement(source[key]);
+        destination[key] = copyElement(source[key], maxDepth);
       }
     } else if (source && typeof source.hasOwnProperty === 'function') {
       // Slow path, which must rely on hasOwnProperty
       for (key in source) {
         if (source.hasOwnProperty(key)) {
-          destination[key] = copyElement(source[key]);
+          destination[key] = copyElement(source[key], maxDepth);
         }
       }
     } else {
       // Slowest path --- hasOwnProperty can't be called as a method
       for (key in source) {
         if (hasOwnProperty.call(source, key)) {
-          destination[key] = copyElement(source[key]);
+          destination[key] = copyElement(source[key], maxDepth);
         }
       }
     }
@@ -864,7 +932,7 @@ function copy(source, destination) {
     return destination;
   }
 
-  function copyElement(source) {
+  function copyElement(source, maxDepth) {
     // Simple values
     if (!isObject(source)) {
       return source;
@@ -878,7 +946,7 @@ function copy(source, destination) {
 
     if (isWindow(source) || isScope(source)) {
       throw ngMinErr('cpws',
-        "Can't copy! Making copies of Window or Scope instances is not supported.");
+        'Can\'t copy! Making copies of Window or Scope instances is not supported.');
     }
 
     var needsRecurse = false;
@@ -893,7 +961,7 @@ function copy(source, destination) {
     stackDest.push(destination);
 
     return needsRecurse
-      ? copyRecurse(source, destination)
+      ? copyRecurse(source, destination, maxDepth)
       : destination;
   }
 
@@ -911,10 +979,13 @@ function copy(source, destination) {
         return new source.constructor(copyElement(source.buffer), source.byteOffset, source.length);
 
       case '[object ArrayBuffer]':
-        //Support: IE10
+        // Support: IE10
         if (!source.slice) {
+          // If we're in this case we know the environment supports ArrayBuffer
+          /* eslint-disable no-undef */
           var copied = new ArrayBuffer(source.byteLength);
           new Uint8Array(copied).set(new Uint8Array(source));
+          /* eslint-enable */
           return copied;
         }
         return source.slice(0);
@@ -926,7 +997,7 @@ function copy(source, destination) {
         return new source.constructor(source.valueOf());
 
       case '[object RegExp]':
-        var re = new RegExp(source.source, source.toString().match(/[^\/]*$/)[0]);
+        var re = new RegExp(source.source, source.toString().match(/[^/]*$/)[0]);
         re.lastIndex = source.lastIndex;
         return re;
 
@@ -939,6 +1010,10 @@ function copy(source, destination) {
     }
   }
 }
+
+
+// eslint-disable-next-line no-self-compare
+function simpleCompare(a, b) { return a === b || (a !== a && b !== b); }
 
 
 /**
@@ -997,7 +1072,6 @@ function copy(source, destination) {
         angular.module('equalsExample', []).controller('ExampleController', ['$scope', function($scope) {
           $scope.user1 = {};
           $scope.user2 = {};
-          $scope.result;
           $scope.compare = function() {
             $scope.result = angular.equals($scope.user1, $scope.user2);
           };
@@ -1008,6 +1082,7 @@ function copy(source, destination) {
 function equals(o1, o2) {
   if (o1 === o2) return true;
   if (o1 === null || o2 === null) return false;
+  // eslint-disable-next-line no-self-compare
   if (o1 !== o1 && o2 !== o2) return true; // NaN === NaN
   var t1 = typeof o1, t2 = typeof o2, length, key, keySet;
   if (t1 === t2 && t1 === 'object') {
@@ -1021,7 +1096,7 @@ function equals(o1, o2) {
       }
     } else if (isDate(o1)) {
       if (!isDate(o2)) return false;
-      return equals(o1.getTime(), o2.getTime());
+      return simpleCompare(o1.getTime(), o2.getTime());
     } else if (isRegExp(o1)) {
       if (!isRegExp(o2)) return false;
       return o1.toString() === o2.toString();
@@ -1072,9 +1147,8 @@ var csp = function() {
 
   function noUnsafeEval() {
     try {
-      /* jshint -W031, -W054 */
+      // eslint-disable-next-line no-new, no-new-func
       new Function('');
-      /* jshint +W031, +W054 */
       return false;
     } catch (e) {
       return true;
@@ -1095,7 +1169,7 @@ var csp = function() {
  * used to force either jqLite by leaving ng-jq blank or setting the name of
  * the jquery variable under window (eg. jQuery).
  *
- * Since angular looks for this directive when it is loaded (doesn't wait for the
+ * Since AngularJS looks for this directive when it is loaded (doesn't wait for the
  * DOMContentLoaded event), it must be placed on an element that comes before the script
  * which loads angular. Also, only the first instance of `ng-jq` will be used and all
  * others ignored.
@@ -1126,7 +1200,8 @@ var jq = function() {
   var i, ii = ngAttrPrefixes.length, prefix, name;
   for (i = 0; i < ii; ++i) {
     prefix = ngAttrPrefixes[i];
-    if (el = window.document.querySelector('[' + prefix.replace(':', '\\:') + 'jq]')) {
+    el = window.document.querySelector('[' + prefix.replace(':', '\\:') + 'jq]');
+    if (el) {
       name = el.getAttribute(prefix + 'jq');
       break;
     }
@@ -1144,7 +1219,6 @@ function sliceArgs(args, startIndex) {
 }
 
 
-/* jshint -W101 */
 /**
  * @ngdoc function
  * @name angular.bind
@@ -1162,7 +1236,6 @@ function sliceArgs(args, startIndex) {
  * @param {...*} args Optional arguments to be prebound to the `fn` function call.
  * @returns {function()} Function that wraps the `fn` with all the specified bindings.
  */
-/* jshint +W101 */
 function bind(self, fn) {
   var curryArgs = arguments.length > 2 ? sliceArgs(arguments, 2) : [];
   if (isFunction(fn) && !(fn instanceof RegExp)) {
@@ -1209,9 +1282,9 @@ function toJsonReplacer(key, value) {
  *
  * @description
  * Serializes input into a JSON-formatted string. Properties with leading $$ characters will be
- * stripped since angular uses this notation internally.
+ * stripped since AngularJS uses this notation internally.
  *
- * @param {Object|Array|Date|string|number} obj Input to be serialized into JSON.
+ * @param {Object|Array|Date|string|number|boolean} obj Input to be serialized into JSON.
  * @param {boolean|number} [pretty=2] If set to true, the JSON output will contain newlines and whitespace.
  *    If set to an integer, the JSON output will contain that many spaces per indentation.
  * @returns {string|undefined} JSON-ified string representing `obj`.
@@ -1267,10 +1340,11 @@ function fromJson(json) {
 
 var ALL_COLONS = /:/g;
 function timezoneToOffset(timezone, fallback) {
+  // Support: IE 9-11 only, Edge 13-15+
   // IE/Edge do not "understand" colon (`:`) in timezone
   timezone = timezone.replace(ALL_COLONS, '');
   var requestedTimezoneOffset = Date.parse('Jan 01, 1970 00:00:00 ' + timezone) / 60000;
-  return isNaN(requestedTimezoneOffset) ? fallback : requestedTimezoneOffset;
+  return isNumberNaN(requestedTimezoneOffset) ? fallback : requestedTimezoneOffset;
 }
 
 
@@ -1293,18 +1367,13 @@ function convertTimezoneToLocal(date, timezone, reverse) {
  * @returns {string} Returns the string representation of the element.
  */
 function startingTag(element) {
-  element = jqLite(element).clone();
-  try {
-    // turns out IE does not let you set .html() on elements which
-    // are not allowed to have children. So we just ignore it.
-    element.empty();
-  } catch (e) {}
+  element = jqLite(element).clone().empty();
   var elemHtml = jqLite('<div>').append(element).html();
   try {
     return element[0].nodeType === NODE_TYPE_TEXT ? lowercase(elemHtml) :
         elemHtml.
           match(/^(<[^>]+>)/)[1].
-          replace(/^<([\w\-]+)/, function(match, nodeName) {return '<' + lowercase(nodeName);});
+          replace(/^<([\w-]+)/, function(match, nodeName) {return '<' + lowercase(nodeName);});
   } catch (e) {
     return lowercase(elemHtml);
   }
@@ -1337,7 +1406,7 @@ function tryDecodeURIComponent(value) {
  */
 function parseKeyValue(/**string*/keyValue) {
   var obj = {};
-  forEach((keyValue || "").split('&'), function(keyValue) {
+  forEach((keyValue || '').split('&'), function(keyValue) {
     var splitPoint, key, val;
     if (keyValue) {
       key = keyValue = keyValue.replace(/\+/g,'%20');
@@ -1432,6 +1501,58 @@ function getNgAttribute(element, ngAttr) {
   return null;
 }
 
+function allowAutoBootstrap(document) {
+  var script = document.currentScript;
+
+  if (!script) {
+    // Support: IE 9-11 only
+    // IE does not have `document.currentScript`
+    return true;
+  }
+
+  // If the `currentScript` property has been clobbered just return false, since this indicates a probable attack
+  if (!(script instanceof window.HTMLScriptElement || script instanceof window.SVGScriptElement)) {
+    return false;
+  }
+
+  var attributes = script.attributes;
+  var srcs = [attributes.getNamedItem('src'), attributes.getNamedItem('href'), attributes.getNamedItem('xlink:href')];
+
+  return srcs.every(function(src) {
+    if (!src) {
+      return true;
+    }
+    if (!src.value) {
+      return false;
+    }
+
+    var link = document.createElement('a');
+    link.href = src.value;
+
+    if (document.location.origin === link.origin) {
+      // Same-origin resources are always allowed, even for non-whitelisted schemes.
+      return true;
+    }
+    // Disabled bootstrapping unless angular.js was loaded from a known scheme used on the web.
+    // This is to prevent angular.js bundled with browser extensions from being used to bypass the
+    // content security policy in web pages and other browser extensions.
+    switch (link.protocol) {
+      case 'http:':
+      case 'https:':
+      case 'ftp:':
+      case 'blob:':
+      case 'file:':
+      case 'data:':
+        return true;
+      default:
+        return false;
+    }
+  });
+}
+
+// Cached as it has to run during loading so that document.currentScript is available.
+var isAutoBootstrapAllowed = allowAutoBootstrap(window.document);
+
 /**
  * @ngdoc directive
  * @name ngApp
@@ -1473,9 +1594,13 @@ function getNgAttribute(element, ngAttr) {
  * document would not be compiled, the `AppController` would not be instantiated and the `{{ a+b }}`
  * would not be resolved to `3`.
  *
+ * @example
+ *
+ * ### Simple Usage
+ *
  * `ngApp` is the easiest, and most common way to bootstrap an application.
  *
- <example module="ngAppDemo">
+ <example module="ngAppDemo" name="ng-app">
    <file name="index.html">
    <div ng-controller="ngAppDemoController">
      I can add: {{a}} + {{b}} =  {{ a+b }}
@@ -1489,9 +1614,13 @@ function getNgAttribute(element, ngAttr) {
    </file>
  </example>
  *
+ * @example
+ *
+ * ### With `ngStrictDi`
+ *
  * Using `ngStrictDi`, you would see something like this:
  *
- <example ng-app-included="true">
+ <example ng-app-included="true" name="strict-di">
    <file name="index.html">
    <div ng-app="ngAppStrictDemo" ng-strict-di>
        <div ng-controller="GoodController1">
@@ -1540,7 +1669,7 @@ function getNgAttribute(element, ngAttr) {
      }])
      .controller('GoodController2', GoodController2);
      function GoodController2($scope) {
-       $scope.name = "World";
+       $scope.name = 'World';
      }
      GoodController2.$inject = ['$scope'];
    </file>
@@ -1590,7 +1719,12 @@ function angularInit(element, bootstrap) {
     }
   });
   if (appElement) {
-    config.strictDi = getNgAttribute(appElement, "strict-di") !== null;
+    if (!isAutoBootstrapAllowed) {
+      window.console.error('AngularJS: disabling automatic bootstrap. <script> protocol indicates ' +
+          'an extension, document.location.href does not match.');
+      return;
+    }
+    config.strictDi = getNgAttribute(appElement, 'strict-di') !== null;
     bootstrap(appElement, module ? [module] : [], config);
   }
 }
@@ -1600,14 +1734,14 @@ function angularInit(element, bootstrap) {
  * @name angular.bootstrap
  * @module ng
  * @description
- * Use this function to manually start up angular application.
+ * Use this function to manually start up AngularJS application.
  *
  * For more information, see the {@link guide/bootstrap Bootstrap guide}.
  *
- * Angular will detect if it has been loaded into the browser more than once and only allow the
+ * AngularJS will detect if it has been loaded into the browser more than once and only allow the
  * first loaded script to be bootstrapped and will report a warning to the browser console for
  * each of the subsequent scripts. This prevents strange results in applications, where otherwise
- * multiple instances of Angular try to work on the DOM.
+ * multiple instances of AngularJS try to work on the DOM.
  *
  * <div class="alert alert-warning">
  * **Note:** Protractor based end-to-end tests cannot use this function to bootstrap manually.
@@ -1641,7 +1775,7 @@ function angularInit(element, bootstrap) {
  * </html>
  * ```
  *
- * @param {DOMElement} element DOM element which is the root of angular application.
+ * @param {DOMElement} element DOM element which is the root of AngularJS application.
  * @param {Array<String|Function|Array>=} modules an array of modules to load into the application.
  *     Each item in the array should be the name of a predefined module or a (DI annotated)
  *     function that will be invoked by the injector as a `config` block.
@@ -1668,7 +1802,7 @@ function bootstrap(element, modules, config) {
       // Encode angle brackets to prevent input from being sanitized to empty string #8683.
       throw ngMinErr(
           'btstrpd',
-          "App already bootstrapped with this element '{0}'",
+          'App already bootstrapped with this element \'{0}\'',
           tag.replace(/</,'&lt;').replace(/>/,'&gt;'));
     }
 
@@ -1741,9 +1875,9 @@ function reloadWithDebugInfo() {
  * @name angular.getTestability
  * @module ng
  * @description
- * Get the testability service for the instance of Angular on the given
+ * Get the testability service for the instance of AngularJS on the given
  * element.
- * @param {DOMElement} element DOM element which is the root of angular application.
+ * @param {DOMElement} element DOM element which is the root of AngularJS application.
  */
 function getTestability(rootElement) {
   var injector = angular.element(rootElement).injector();
@@ -1777,15 +1911,15 @@ function bindJQuery() {
                                  window[jqName];   // use jQuery specified by `ngJq`
 
   // Use jQuery if it exists with proper functionality, otherwise default to us.
-  // Angular 1.2+ requires jQuery 1.7+ for on()/off() support.
-  // Angular 1.3+ technically requires at least jQuery 2.1+ but it may work with older
+  // AngularJS 1.2+ requires jQuery 1.7+ for on()/off() support.
+  // AngularJS 1.3+ technically requires at least jQuery 2.1+ but it may work with older
   // versions. It will not work for sure with jQuery <1.7, though.
   if (jQuery && jQuery.fn.on) {
     jqLite = jQuery;
     extend(jQuery.fn, {
       scope: JQLitePrototype.scope,
       isolateScope: JQLitePrototype.isolateScope,
-      controller: JQLitePrototype.controller,
+      controller: /** @type {?} */ (JQLitePrototype).controller,
       injector: JQLitePrototype.injector,
       inheritedData: JQLitePrototype.inheritedData
     });
@@ -1797,7 +1931,7 @@ function bindJQuery() {
     jQuery.cleanData = function(elems) {
       var events;
       for (var i = 0, elem; (elem = elems[i]) != null; i++) {
-        events = jQuery._data(elem, "events");
+        events = jQuery._data(elem, 'events');
         if (events && events.$destroy) {
           jQuery(elem).triggerHandler('$destroy');
         }
@@ -1819,7 +1953,7 @@ function bindJQuery() {
  */
 function assertArg(arg, name, reason) {
   if (!arg) {
-    throw ngMinErr('areq', "Argument '{0}' is {1}", (name || '?'), (reason || "required"));
+    throw ngMinErr('areq', 'Argument \'{0}\' is {1}', (name || '?'), (reason || 'required'));
   }
   return arg;
 }
@@ -1841,7 +1975,7 @@ function assertArgFn(arg, name, acceptArrayAnnotation) {
  */
 function assertNotHasOwnProperty(name, context) {
   if (name === 'hasOwnProperty') {
-    throw ngMinErr('badname', "hasOwnProperty is not a valid {0} name", context);
+    throw ngMinErr('badname', 'hasOwnProperty is not a valid {0} name', context);
   }
 }
 

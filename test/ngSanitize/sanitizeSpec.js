@@ -22,7 +22,7 @@ describe('HTML', function() {
 
     var handler, start, text, comment;
     beforeEach(function() {
-      text = "";
+      text = '';
       start = null;
       handler = {
         start: function(tag, attrs) {
@@ -49,6 +49,8 @@ describe('HTML', function() {
           comment = comment_;
         }
       };
+      // Trigger the $sanitizer provider to execute, which initializes the `htmlParser` function.
+      inject(function($sanitize) {});
     });
 
     it('should not parse comments', function() {
@@ -128,6 +130,17 @@ describe('HTML', function() {
 
   it('should remove attrs', function() {
     expectHTML('a<div style="abc">b</div>c').toEqual('a<div>b</div>c');
+  });
+
+  it('should handle large datasets', function() {
+    // Large is non-trivial to quantify, but handling ~100,000 should be sufficient for most purposes.
+    var largeNumber = 17; // 2^17 = 131,072
+    var result = '<div>b</div>';
+    // Ideally we would use repeat, but that isn't supported in IE.
+    for (var i = 0; i < largeNumber; i++) {
+      result += result;
+    }
+    expectHTML('a' + result + 'c').toEqual('a' + result + 'c');
   });
 
   it('should remove style', function() {
@@ -235,13 +248,45 @@ describe('HTML', function() {
       .toEqual('<p>text1text2</p>');
   });
 
+  it('should throw on clobbered elements', function() {
+    inject(function($sanitize) {
+      expect(function() {
+        $sanitize('<form><input name="parentNode" /></form>');
+      }).toThrowMinErr('$sanitize', 'elclob');
+
+      expect(function() {
+        $sanitize('<form><div><div><input name="parentNode" /></div></div></form>');
+      }).toThrowMinErr('$sanitize', 'elclob');
+
+      expect(function() {
+        $sanitize('<form><input name="nextSibling" /></form>');
+      }).toThrowMinErr('$sanitize', 'elclob');
+
+      expect(function() {
+        $sanitize('<form><div><div><input name="nextSibling" /></div></div></form>');
+      }).toThrowMinErr('$sanitize', 'elclob');
+    });
+  });
+
+  // See https://github.com/cure53/DOMPurify/blob/a992d3a75031cb8bb032e5ea8399ba972bdf9a65/src/purify.js#L439-L449
+  it('should not allow JavaScript execution when creating inert document', inject(function($sanitize) {
+    $sanitize('<svg><g onload="window.xxx = 100"></g></svg>');
+
+    expect(window.xxx).toBe(undefined);
+    delete window.xxx;
+  }));
+
+  // See https://github.com/cure53/DOMPurify/releases/tag/0.6.7
+  it('should not allow JavaScript hidden in badly formed HTML to get through sanitization (Firefox bug)', inject(function($sanitize) {
+    var doc = $sanitize('<svg><p><style><img src="</style><img src=x onerror=alert(1)//">');
+    expect(doc).toEqual('<p><img src="x"></p>');
+  }));
 
   describe('SVG support', function() {
 
     beforeEach(module(function($sanitizeProvider) {
       $sanitizeProvider.enableSvg(true);
     }));
-
 
     it('should accept SVG tags', function() {
       expectHTML('<svg width="400px" height="150px" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"></svg>')
@@ -313,7 +358,7 @@ describe('HTML', function() {
     beforeEach(function() {
       html = '';
       uriValidator = jasmine.createSpy('uriValidator');
-      writer = htmlSanitizeWriter({push:function(text) {html+=text;}}, uriValidator);
+      writer = htmlSanitizeWriter({push:function(text) {html += text;}}, uriValidator);
     });
 
     it('should write basic HTML', function() {
@@ -341,13 +386,13 @@ describe('HTML', function() {
       expect(html).toEqual('<div rel="!@#$%^&amp;*()_+-={}[]:&#34;;\'&lt;&gt;?,./`~ &#10;&#0;&#13;&#295;">');
     });
 
-    it('should ignore missformed elements', function() {
+    it('should ignore misformed elements', function() {
       writer.start('d>i&v', {});
       expect(html).toEqual('');
     });
 
     it('should ignore unknown attributes', function() {
-      writer.start('div', {unknown:""});
+      writer.start('div', {unknown:''});
       expect(html).toEqual('<div>');
     });
 
@@ -479,13 +524,13 @@ describe('HTML', function() {
     });
 
     it('should not be URI', function() {
-      /* jshint scripturl: true */
+      // eslint-disable-next-line no-script-url
       expect('javascript:alert').not.toBeValidUrl();
     });
 
     describe('javascript URLs', function() {
       it('should ignore javascript:', function() {
-        /* jshint scripturl: true */
+        // eslint-disable-next-line no-script-url
         expect('JavaScript:abc').not.toBeValidUrl();
         expect(' \n Java\n Script:abc').not.toBeValidUrl();
         expect('http://JavaScript/my.js').toBeValidUrl();
@@ -497,7 +542,7 @@ describe('HTML', function() {
         expect('&#106 &#97;&#118;&#97;&#115;&#99;&#114;&#105;&#112;&#116;&#58;').not.toBeValidUrl();
       });
 
-      it('should ignore decimal with leading 0 encodede javascript:', function() {
+      it('should ignore decimal with leading 0 encoded javascript:', function() {
         expect('&#0000106&#0000097&#0000118&#0000097&#0000115&#0000099&#0000114&#0000105&#0000112&#0000116&#0000058').not.toBeValidUrl();
         expect('&#0000106 &#0000097&#0000118&#0000097&#0000115&#0000099&#0000114&#0000105&#0000112&#0000116&#0000058').not.toBeValidUrl();
         expect('&#0000106; &#0000097&#0000118&#0000097&#0000115&#0000099&#0000114&#0000105&#0000112&#0000116&#0000058').not.toBeValidUrl();

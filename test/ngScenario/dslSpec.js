@@ -1,6 +1,6 @@
 'use strict';
 
-describe("angular.scenario.dsl", function() {
+describe('angular.scenario.dsl', function() {
   var element;
   var $window, $root;
   var eventLog;
@@ -128,7 +128,7 @@ describe("angular.scenario.dsl", function() {
         expect($root.futureResult).toEqual('http://futureUrl/');
       });
 
-      it('should complete if angular is missing from app frame', function() {
+      it('should complete if AngularJS is missing from app frame', function() {
         delete $window.angular;
         $root.dsl.browser().navigateTo('http://myurl');
         expect($window.location).toEqual('http://myurl');
@@ -765,7 +765,7 @@ describe("angular.scenario.dsl", function() {
         it('should return value in text input', function() {
           doc.append('<input ng-model="test.input" value="something">');
           $root.dsl.input('test.input').val();
-          expect($root.futureResult).toEqual("something");
+          expect($root.futureResult).toEqual('something');
         });
       });
     });
